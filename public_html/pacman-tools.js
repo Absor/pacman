@@ -28,6 +28,8 @@ pacman.tools = (function() {
     }
 
     return {
-        getMovement: getMovement
+        getMovement: getMovement,
+        distanceBetween: distanceBetween,
+        getTilePosition: getTilePosition
     };
 })();
