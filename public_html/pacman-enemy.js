@@ -1,15 +1,15 @@
-pacman.Enemy = function(number, startPosition) {
+pacman.Enemy = function(name, startPosition) {
     // position and movement
-    this.number = number % 4;
+    this.name = name;
     this.home = startPosition;
     this.position = startPosition;
-    this.ai = pacman.ai[0];
+    this.ai = pacman.ai[this.name];
     this.movement = {x: -1, y: 0};
 
     // paper object
     this.paperObject = pacman.paper.path();
     this.paperObject.attr(pacman.svg.ghost(this.position));
-    this.paperObject.attr("fill", pacman.config.colours.ghost[this.number]);
+    this.paperObject.attr("fill", pacman.config.colours.ghost[this.name]);
     this.paperObject.attr("stroke", "none");
 
     this.animate = function() {

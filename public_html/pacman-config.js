@@ -6,7 +6,8 @@
 // S = score area
 // L = life / fruit counter area
 // G = ghost room gate
-// H = ghost home
+// H = ghost start
+// X = ghost home (reset spot)
 // N = no coin area (empty corridor)
 // B = bad area
 
@@ -19,7 +20,12 @@ pacman.config = {
     },
     colours: {
         pacman: "rgb(255, 255, 0)",
-        ghost: ["rgb(255, 0, 0)", "rgb(0, 255, 0)", "rgb(0, 0, 255)", "rgb(255, 255, 255)"],
+        ghost: {
+            blinky: "rgb(255, 0, 0)",
+            pinky: "rgb(0, 255, 0)",
+            inky: "rgb(0, 0, 255)",
+            clyde: "rgb(255, 255, 255)"
+        },
         background: "rgb(0, 0, 0)",
         wall: "rgb(0, 100, 200)",
         gate: "rgb(255, 0, 0)",
@@ -41,10 +47,10 @@ pacman.config = {
             "WCCCCCCWWCCCCWWCCCCWWCCCCCCW",
             "WWWWWWCWWWWWNWWNWWWWWCWWWWWW",
             "WWWWWWCWWWWWNWWNWWWWWCWWWWWW",
-            "WWWWWWCWWNNNNNNNNNNWWCWWWWWW",
+            "WWWWWWCWWNNNNHNNNNNWWCWWWWWW",
             "WWWWWWCWWNWWWGGWWWNWWCWWWWWW",
             "WWWWWWCWWNWBBBBBBWNWWCWWWWWW",
-            "NNNNNNCNNNWBHHHHBWNNNCNNNNNN",
+            "NNNNNNCNNNWHBHXHBWNNNCNNNNNN",
             "WWWWWWCWWNWBBBBBBWNWWCWWWWWW",
             "WWWWWWCWWNWWWWWWWWNWWCWWWWWW",
             "WWWWWWCWWNNNNNNNNNNWWCWWWWWW",

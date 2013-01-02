@@ -1,7 +1,7 @@
-pacman.ai = [];
+pacman.ai = {};
 
 // Blinky
-pacman.ai[0] = (function() {
+pacman.ai.blinky = (function() {
     function getMovement(oldMovement, ownPosition, mode) {
         var playerPosition = pacman.player.getTilePosition();
         var directions = [];
@@ -75,7 +75,7 @@ pacman.ai[0] = (function() {
 })();
 
 // Pinky
-pacman.ai[1] = (function() {
+pacman.ai.pinky = (function() {
     function getMovement(ownPosition, mode) {
         var playerPosition = pacman.player.getTilePosition();
     }
@@ -86,7 +86,7 @@ pacman.ai[1] = (function() {
 })();
 
 // Inky
-pacman.ai[2] = (function() {
+pacman.ai.inky = (function() {
     function getMovement(ownPosition, mode) {
         var playerPosition = pacman.player.getTilePosition();
     }
@@ -98,7 +98,7 @@ pacman.ai[2] = (function() {
 
 
 // Clyde
-pacman.ai[3] = (function() {
+pacman.ai.clyde = (function() {
     function getMovement(ownPosition) {
         var playerPosition = pacman.player.getTilePosition();
     }

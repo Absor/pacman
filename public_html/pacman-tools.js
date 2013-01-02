@@ -13,12 +13,12 @@ pacman.tools = (function() {
                 return {x: 0, y: -1};
         }
     }
-    
+
     // Euclidean distance between two points
     function distanceBetween(x1, y1, x2, y2) {
-        return Math.sqrt(Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2));
+        return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
     }
-    
+
     // Gives position in grid by pixel position
     function getTilePosition(x, y) {
         return {
@@ -27,9 +27,14 @@ pacman.tools = (function() {
         };
     }
 
+    function sortByDistance(a, b) {
+        return a.distance - b.distance;
+    }
+
     return {
         getMovement: getMovement,
         distanceBetween: distanceBetween,
-        getTilePosition: getTilePosition
+        getTilePosition: getTilePosition,
+        sortByDistance: sortByDistance
     };
 })();

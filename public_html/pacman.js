@@ -26,7 +26,7 @@ var pacman = (function() {
         $.each(pacman.ghosts, function(index, ghost) {
             ghost.move();
         });
-    
+
         // eat everything at pac-man's position
         pacman.player.eat();
 
@@ -72,9 +72,10 @@ $(document).ready(function() {
 
     // add ghosts
     pacman.ghosts = [];
-    $.each(pacman.enemyStarts, function(index, position) {
-        pacman.ghosts.push(new pacman.Enemy(index, position));
-    });
+    pacman.ghosts.push(new pacman.Enemy("blinky", pacman.enemyStarts[0]));
+    pacman.ghosts.push(new pacman.Enemy("pinky", pacman.enemyStarts[1]));
+    pacman.ghosts.push(new pacman.Enemy("inky", pacman.enemyStarts[2]));
+    pacman.ghosts.push(new pacman.Enemy("clyde", pacman.enemyStarts[3]));
 
     // roll game
     setInterval(pacman.tick, 1000 / 60);
