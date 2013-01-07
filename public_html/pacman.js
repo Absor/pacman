@@ -7,10 +7,6 @@ var pacman = (function() {
         $("#points").html(points);
     }
 
-    function getPoints() {
-        return points;
-    }
-
     function tick() {
         pacman.frame++;
         pacman.frame %= 30;
@@ -26,6 +22,9 @@ var pacman = (function() {
         $.each(pacman.ghosts, function(index, ghost) {
             ghost.move();
         });
+
+        // collisions
+        checkCollisions();
 
         // eat everything at pac-man's position
         pacman.player.eat();
@@ -43,10 +42,51 @@ var pacman = (function() {
         });
     }
 
+    function start() {
+        setInterval(tick, 1000 / 60);
+        chase();
+    }
+
+    function checkCollisions() {
+        var playerPosition = pacman.tools.getTilePosition(pacman.player.position);
+        $.each(pacman.ghosts, function(index, ghost) {
+            var ghostPosition = pacman.tools.getTilePosition(ghost.position);
+            if (playerPosition.row === ghostPosition.row && playerPosition.col === ghostPosition.col) {
+                // handle collision
+                console.log("DÖD");
+                return;
+            }
+        });
+    }
+
+    // functions for controlling modes
+    function chase() {
+        pacman.mode = "chase";
+        clearInterval(pacman.modeInterval);
+        pacman.modeInterval = setInterval(scatter, 15000);
+    }
+
+    function scatter() {
+        pacman.mode = "scatter";
+        clearInterval(pacman.modeInterval);
+        pacman.modeInterval = setInterval(chase, 5000);
+    }
+
+    function fright() {
+        pacman.mode = "fright";
+        clearInterval(pacman.modeInterval);
+        pacman.modeInterval = setInterval(chase, 15000);
+    }
+
+    // reset game: move everything to start position
+    function reset() {
+
+    }
+
     return {
-        tick: tick,
+        start: start,
         addPoints: addPoints,
-        getPoints: getPoints
+        fright: fright
     };
 })();
 
@@ -64,7 +104,7 @@ $(document).ready(function() {
         pacman.keyhandler.keyup(eventInfo.keyCode);
     });
 
-    // build starting screen
+    // build starting screen (atm playfield, not startscreen)
     pacman.fieldBuilder.buildField(pacman.config.playField1);
 
     // add player
@@ -73,10 +113,10 @@ $(document).ready(function() {
     // add ghosts
     pacman.ghosts = [];
     pacman.ghosts.push(new pacman.Enemy("blinky", pacman.enemyStarts[0]));
-    pacman.ghosts.push(new pacman.Enemy("pinky", pacman.enemyStarts[1]));
-    pacman.ghosts.push(new pacman.Enemy("inky", pacman.enemyStarts[2]));
+    pacman.ghosts.push(new pacman.Enemy("inky", pacman.enemyStarts[1]));
+    pacman.ghosts.push(new pacman.Enemy("pinky", pacman.enemyStarts[2]));
     pacman.ghosts.push(new pacman.Enemy("clyde", pacman.enemyStarts[3]));
 
     // roll game
-    setInterval(pacman.tick, 1000 / 60);
+    pacman.start();
 });

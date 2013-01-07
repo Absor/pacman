@@ -20,10 +20,10 @@ pacman.tools = (function() {
     }
 
     // Gives position in grid by pixel position
-    function getTilePosition(x, y) {
+    function getTilePosition(position) {
         return {
-            row: Math.floor((y + pacman.config.tileSize / 2) / pacman.config.tileSize),
-            col: Math.floor((x + pacman.config.tileSize / 2) / pacman.config.tileSize)
+            row: Math.floor((position.y + pacman.config.tileSize / 2) / pacman.config.tileSize),
+            col: Math.floor((position.x + pacman.config.tileSize / 2) / pacman.config.tileSize)
         };
     }
 

@@ -1,6 +1,7 @@
 pacman.fieldBuilder = (function() {
 
     function buildField(fieldContainer) {
+        pacman.fieldInUse = fieldContainer;
         // clear paper
         pacman.paper.clear();
         // set size
@@ -40,7 +41,6 @@ pacman.fieldBuilder = (function() {
                         // if it's a ghost room gate
                         createGate(row, col);
                         pacman.playerMovement[row][col] = false;
-                        pacman.goodTarget = {row: row, col: col};
                         // is also bad
                         markBad(row, col);
                         break;
@@ -65,6 +65,12 @@ pacman.fieldBuilder = (function() {
                     case "B":
                         // bad area, ghosts can't stay here
                         markBad(row, col);
+                        break;
+                    case "Z":
+                        pacman.goodTarget = {row: row, col: col};
+                        break;
+                    case "X":
+                        pacman.ghostHome = {row: row, col: col};
                         break;
                 }
             }
@@ -134,7 +140,7 @@ pacman.fieldBuilder = (function() {
 
     function setEnemyStart(row, col) {
         pacman.enemyStarts.push({
-            x: col * pacman.config.tileSize,
+            x: col * pacman.config.tileSize + pacman.config.tileSize / 2,
             y: row * pacman.config.tileSize
         });
     }

@@ -1,72 +1,67 @@
-pacman.ai = {};
+pacman.ai = {
+    setUpDirections: function(oldMovement, ownPosition, movementGrid) {
+        var directions = [];
+
+        // can go up?
+        if (oldMovement.y !== 1 && movementGrid[ownPosition.row - 1][ownPosition.col]) {
+            directions.push({distance: null, x: 0, y: -1});
+        }
+        // can go right?
+        if (oldMovement.x !== -1 && movementGrid[ownPosition.row][ownPosition.col + 1]) {
+            directions.push({distance: null, x: 1, y: 0});
+        }
+        // can go down?
+        if (oldMovement.y !== -1 && movementGrid[ownPosition.row + 1][ownPosition.col]) {
+            directions.push({distance: null, x: 0, y: 1});
+        }
+        // can go left?
+        if (oldMovement.x !== 1 && movementGrid[ownPosition.row][ownPosition.col - 1]) {
+            directions.push({distance: null, x: -1, y: 0});
+        }
+        return directions;
+    },
+    setDistances: function(directions, ownPosition, targetPosition) {
+        $.each(directions, function(index, direction) {
+            direction.distance = pacman.tools.distanceBetween(ownPosition.col + direction.x,
+                    ownPosition.row + direction.y, targetPosition.col, targetPosition.row);
+        });
+    }
+};
 
 // Blinky
 pacman.ai.blinky = (function() {
     function getMovement(oldMovement, ownPosition, mode) {
-        var playerPosition = pacman.player.getTilePosition();
-        var directions = [];
-        var i = 0;
-        if (pacman.badArea[ownPosition.row][ownPosition.col]) {
-            // can go up?
-            if (oldMovement.y !== 1 && pacman.enemyMovement[ownPosition.row - 1][ownPosition.col]) {
-                var distance = Math.sqrt(Math.pow(ownPosition.row - 1 - pacman.goodTarget.row, 2) + Math.pow(ownPosition.col - pacman.goodTarget.col, 2));
-                directions[i] = {distance: distance, x: 0, y: -1};
-                i++;
-            }
-            // can go right?
-            if (oldMovement.x !== -1 && pacman.enemyMovement[ownPosition.row][ownPosition.col + 1]) {
-                var distance = Math.sqrt(Math.pow(ownPosition.row - pacman.goodTarget.row, 2) + Math.pow(ownPosition.col + 1 - pacman.goodTarget.col, 2));
-                directions[i] = {distance: distance, x: 1, y: 0};
-                i++;
-            }
-            // can go down?
-            if (oldMovement.y !== -1 && pacman.enemyMovement[ownPosition.row + 1][ownPosition.col]) {
-                var distance = Math.sqrt(Math.pow(ownPosition.row + 1 - pacman.goodTarget.row, 2) + Math.pow(ownPosition.col - pacman.goodTarget.col, 2));
-                directions[i] = {distance: distance, x: 0, y: 1};
-                i++;
-            }
-            // can go left?
-            if (oldMovement.x !== 1 && pacman.enemyMovement[ownPosition.row][ownPosition.col - 1]) {
-                var distance = Math.sqrt(Math.pow(ownPosition.row - pacman.goodTarget.row, 2) + Math.pow(ownPosition.col - 1 - pacman.goodTarget.col, 2));
-                directions[i] = {distance: distance, x: -1, y: 0};
-                i++;
-            }
 
-            directions.sort(function(a, b) {
-                return a.distance - b.distance;
-            });
-            return directions[0];
-        } else {
-            // can go up?
-            if (oldMovement.y !== 1 && pacman.enemyMovement[ownPosition.row - 1][ownPosition.col] && !pacman.badArea[ownPosition.row - 1][ownPosition.col]) {
-                var distance = Math.sqrt(Math.pow(ownPosition.row - 1 - playerPosition.row, 2) + Math.pow(ownPosition.col - playerPosition.col, 2));
-                directions[i] = {distance: distance, x: 0, y: -1};
-                i++;
-            }
-            // can go right?
-            if (oldMovement.x !== -1 && pacman.enemyMovement[ownPosition.row][ownPosition.col + 1] && !pacman.badArea[ownPosition.row][ownPosition.col + 1]) {
-                var distance = Math.sqrt(Math.pow(ownPosition.row - playerPosition.row, 2) + Math.pow(ownPosition.col + 1 - playerPosition.col, 2));
-                directions[i] = {distance: distance, x: 1, y: 0};
-                i++;
-            }
-            // can go down?
-            if (oldMovement.y !== -1 && pacman.enemyMovement[ownPosition.row + 1][ownPosition.col] && !pacman.badArea[ownPosition.row + 1][ownPosition.col]) {
-                var distance = Math.sqrt(Math.pow(ownPosition.row + 1 - playerPosition.row, 2) + Math.pow(ownPosition.col - playerPosition.col, 2));
-                directions[i] = {distance: distance, x: 0, y: 1};
-                i++;
-            }
-            // can go left?
-            if (oldMovement.x !== 1 && pacman.enemyMovement[ownPosition.row][ownPosition.col - 1] && !pacman.badArea[ownPosition.row][ownPosition.col - 1]) {
-                var distance = Math.sqrt(Math.pow(ownPosition.row - playerPosition.row, 2) + Math.pow(ownPosition.col - 1 - playerPosition.col, 2));
-                directions[i] = {distance: distance, x: -1, y: 0};
-                i++;
-            }
+        var movementGrid = pacman.playerMovement;
 
-            directions.sort(function(a, b) {
-                return a.distance - b.distance;
-            });
-            return directions[0];
+        var directions = pacman.ai.setUpDirections(oldMovement, ownPosition, movementGrid);
+
+        switch (mode) {
+            case "scatter":
+                pacman.ai.setDistances(directions, ownPosition, {row: 0, col: 0});
+                break;
+            case "chase":
+                var playerPosition = pacman.tools.getTilePosition(pacman.player.position);
+                pacman.ai.setDistances(directions, ownPosition, playerPosition);
+                break;
+            case "fright":
+                pacman.ai.setDistances(directions, ownPosition, pacman.goodTarget);
+                break;
+            case "dead":
+                movementGrid = pacman.enemyMovement;
+                directions = pacman.ai.setUpDirections(oldMovement, ownPosition, movementGrid);
+                pacman.ai.setDistances(directions, ownPosition, pacman.ghostHome);
+                break;
+            case "out":
+                movementGrid = pacman.enemyMovement;
+                directions = pacman.ai.setUpDirections(oldMovement, ownPosition, movementGrid);
+                pacman.ai.setDistances(directions, ownPosition, pacman.goodTarget);
+                break;
         }
+
+        directions.sort(pacman.tools.sortByDistance);
+
+        return directions[0];
     }
 
     return {
@@ -77,7 +72,7 @@ pacman.ai.blinky = (function() {
 // Pinky
 pacman.ai.pinky = (function() {
     function getMovement(ownPosition, mode) {
-        var playerPosition = pacman.player.getTilePosition();
+        var playerPosition = pacman.tools.getTilePosition(pacman.player.position);
     }
 
     return {
@@ -88,7 +83,7 @@ pacman.ai.pinky = (function() {
 // Inky
 pacman.ai.inky = (function() {
     function getMovement(ownPosition, mode) {
-        var playerPosition = pacman.player.getTilePosition();
+        var playerPosition = pacman.tools.getTilePosition(pacman.player.position);
     }
 
     return {
@@ -100,7 +95,7 @@ pacman.ai.inky = (function() {
 // Clyde
 pacman.ai.clyde = (function() {
     function getMovement(ownPosition) {
-        var playerPosition = pacman.player.getTilePosition();
+        var playerPosition = pacman.tools.getTilePosition(pacman.player.position);
     }
 
     return {

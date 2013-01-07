@@ -111,12 +111,4 @@ pacman.Player = function() {
             pacman.pellets[row][col] = undefined;
         }
     };
-
-    // position in the grid
-    this.getTilePosition = function() {
-        return {
-            row: Math.floor((this.position.y + pacman.config.tileSize / 2) / pacman.config.tileSize),
-            col: Math.floor((this.position.x + pacman.config.tileSize / 2) / pacman.config.tileSize)
-        };
-    };
 };

@@ -1,10 +1,11 @@
 pacman.Enemy = function(name, startPosition) {
     // position and movement
     this.name = name;
-    this.home = startPosition;
+    this.originalStart = startPosition;
     this.position = startPosition;
-    this.ai = pacman.ai[this.name];
+    this.ai = pacman.ai["blinky"];
     this.movement = {x: -1, y: 0};
+    this.mode = "out";
 
     // paper object
     this.paperObject = pacman.paper.path();
@@ -47,7 +48,18 @@ pacman.Enemy = function(name, startPosition) {
 
         // if we get to crossroads, ask ai for where to go
         if (this.position.x % pacman.config.tileSize === 0 && this.position.y % pacman.config.tileSize === 0) {
-            this.movement = this.ai.getMovement(this.movement, {row: this.position.y / pacman.config.tileSize, col: this.position.x / pacman.config.tileSize});
+            var ownPosition = {row: this.position.y / pacman.config.tileSize, col: this.position.x / pacman.config.tileSize};
+
+            if (this.mode === "dead" && pacman.ghostHome.row === ownPosition.row && pacman.ghostHome.col === ownPosition.col) {
+                this.mode = "out";
+            } else if (this.mode === "out" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
+                this.mode = pacman.mode;
+            }
+
+            var newMovement = this.ai.getMovement(this.movement, ownPosition, this.mode);
+            if (newMovement !== undefined) {
+                this.movement = newMovement;
+            }
         }
 
         // continue movement
@@ -57,5 +69,13 @@ pacman.Enemy = function(name, startPosition) {
         };
 
         this.position = newPosition;
+
+        // if we move outside the field
+        if (this.position.x < 0) {
+            this.position.x += pacman.config.tileSize * pacman.fieldInUse.width;
+        }
+        if (this.position.x > pacman.config.tileSize * pacman.fieldInUse.width) {
+            this.position.x -= pacman.config.tileSize * pacman.fieldInUse.width;
+        }
     };
 };

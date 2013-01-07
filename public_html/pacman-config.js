@@ -16,15 +16,15 @@ pacman.config = {
     tileSize: 20,
     speeds: {
         player: 1.5,
-        enemy: 1.5
+        enemy: 0.3
     },
     colours: {
         pacman: "rgb(255, 255, 0)",
         ghost: {
             blinky: "rgb(255, 0, 0)",
-            pinky: "rgb(0, 255, 0)",
-            inky: "rgb(0, 0, 255)",
-            clyde: "rgb(255, 255, 255)"
+            inky: "rgb(0, 245, 255)",
+            pinky: "rgb(255, 192, 203)",
+            clyde: "rgb(255, 215, 0)"
         },
         background: "rgb(0, 0, 0)",
         wall: "rgb(0, 100, 200)",
@@ -47,7 +47,7 @@ pacman.config = {
             "WCCCCCCWWCCCCWWCCCCWWCCCCCCW",
             "WWWWWWCWWWWWNWWNWWWWWCWWWWWW",
             "WWWWWWCWWWWWNWWNWWWWWCWWWWWW",
-            "WWWWWWCWWNNNNHNNNNNWWCWWWWWW",
+            "WWWWWWCWWNNNNHZNNNNWWCWWWWWW",
             "WWWWWWCWWNWWWGGWWWNWWCWWWWWW",
             "WWWWWWCWWNWBBBBBBWNWWCWWWWWW",
             "NNNNNNCNNNWHBHXHBWNNNCNNNNNN",
