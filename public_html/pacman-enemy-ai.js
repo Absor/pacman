@@ -38,7 +38,7 @@ pacman.ai.blinky = (function() {
 
         switch (mode) {
             case "scatter":
-                pacman.ai.setDistances(directions, ownPosition, {row: 0, col: 0});
+                pacman.ai.setDistances(directions, ownPosition, {row: 0, col: pacman.fieldInUse.width});
                 break;
             case "chase":
                 var playerPosition = pacman.tools.getTilePosition(pacman.player.position);

@@ -27,7 +27,7 @@ var pacman = (function() {
         checkCollisions();
 
         // eat everything at pac-man's position
-        pacman.player.eat();
+        eat();
 
         animateObjects();
     }
@@ -59,23 +59,51 @@ var pacman = (function() {
         });
     }
 
+    //
+    function eat() {
+        // where is pac-man
+        var playerPosition = pacman.tools.getTilePosition(pacman.player.position);
+        // check if there are pellets in pac-man's position and if yes, remove from game and add points
+        if (pacman.pellets[playerPosition.row][playerPosition.col] !== undefined) {
+            if (pacman.pellets[playerPosition.row][playerPosition.col].isPowerPellet) {
+                console.log("BOOM");
+                pacman.addPoints(50);
+            } else {
+                pacman.addPoints(10);
+            }
+            pacman.pellets[playerPosition.row][playerPosition.col].remove();
+            pacman.pellets[playerPosition.row][playerPosition.col] = undefined;
+        }
+    }
+
     // functions for controlling modes
     function chase() {
         pacman.mode = "chase";
+        setGhostMode(pacman.mode);
         clearInterval(pacman.modeInterval);
         pacman.modeInterval = setInterval(scatter, 15000);
     }
 
     function scatter() {
         pacman.mode = "scatter";
+        setGhostMode(pacman.mode);
         clearInterval(pacman.modeInterval);
         pacman.modeInterval = setInterval(chase, 5000);
     }
 
     function fright() {
         pacman.mode = "fright";
+        setGhostMode(pacman.mode);
         clearInterval(pacman.modeInterval);
         pacman.modeInterval = setInterval(chase, 15000);
+    }
+
+    function setGhostMode(mode) {
+        $.each(pacman.ghosts, function(index, ghost) {
+            if (ghost.mode === "scatter" || ghost.mode === "chase" || ghost.mode === "fright") {
+                ghost.mode = mode;
+            }
+        });
     }
 
     // reset game: move everything to start position

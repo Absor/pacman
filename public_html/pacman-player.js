@@ -94,21 +94,4 @@ pacman.Player = function() {
         }
         return true;
     };
-
-    this.eat = function() {
-        // where is pac-man
-        var row = Math.floor((this.position.y + pacman.config.tileSize / 2) / pacman.config.tileSize);
-        var col = Math.floor((this.position.x + pacman.config.tileSize / 2) / pacman.config.tileSize);
-        // check if there are pellets in pac-man's position and if yes, remove from game and add points
-        if (pacman.pellets[row][col] !== undefined) {
-            if (pacman.pellets[row][col].isPowerPellet) {
-                console.log("BOOM");
-                pacman.addPoints(50);
-            } else {
-                pacman.addPoints(10);
-            }
-            pacman.pellets[row][col].remove();
-            pacman.pellets[row][col] = undefined;
-        }
-    };
 };
