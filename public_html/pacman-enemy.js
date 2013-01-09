@@ -50,13 +50,21 @@ pacman.Enemy = function(name, startPosition) {
         if (this.position.x % pacman.config.tileSize === 0 && this.position.y % pacman.config.tileSize === 0) {
             var ownPosition = {row: this.position.y / pacman.config.tileSize, col: this.position.x / pacman.config.tileSize};
 
-            if (this.mode === "dead" && pacman.ghostHome.row === ownPosition.row && pacman.ghostHome.col === ownPosition.col) {
+            // if ghost is dead and reaches safe target, start going inside home
+            if (this.mode === "dead" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
                 this.mode = "out";
-            } else if (this.mode === "out" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
+            }
+            // if ghost is going in and reaches home position, start going out
+            else if (this.mode === "in" && pacman.ghostHome.row === ownPosition.row && pacman.ghostHome.col === ownPosition.col) {
+                this.mode = "out";
+            }
+            // if ghost is going out and reaches safe target, return to current game mode
+            else if (this.mode === "out" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
                 this.mode = pacman.mode;
             }
 
             var newMovement = this.ai.getMovement(this.movement, ownPosition, this.mode);
+            // if new movement didnt return anything (going outside the grid), don't change movement/direction
             if (newMovement !== undefined) {
                 this.movement = newMovement;
             }
@@ -71,11 +79,16 @@ pacman.Enemy = function(name, startPosition) {
         this.position = newPosition;
 
         // if we move outside the field
+        // TODO
+        // left
         if (this.position.x < 0) {
             this.position.x += pacman.config.tileSize * pacman.fieldInUse.width;
         }
+        // right
         if (this.position.x > pacman.config.tileSize * pacman.fieldInUse.width) {
             this.position.x -= pacman.config.tileSize * pacman.fieldInUse.width;
         }
+        // up
+        // down
     };
 };
