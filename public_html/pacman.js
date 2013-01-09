@@ -53,6 +53,8 @@ var pacman = (function() {
             var ghostPosition = pacman.tools.getTilePosition(ghost.position);
             if (playerPosition.row === ghostPosition.row && playerPosition.col === ghostPosition.col) {
                 // handle collision
+                // ghost in fright mode: kill ghost
+                // ghost in chase mode: -1 life and reset game
                 console.log("DÖD");
                 return;
             }
@@ -66,12 +68,16 @@ var pacman = (function() {
         // check if there are pellets in pac-man's position and if yes, remove from game and add points
         if (pacman.pellets[playerPosition.row][playerPosition.col] !== undefined) {
             if (pacman.pellets[playerPosition.row][playerPosition.col].isPowerPellet) {
-                console.log("BOOM");
+                // if pellet is a power pellet, enter fright mode
+                fright();
                 pacman.addPoints(50);
             } else {
+                // normal pellet
                 pacman.addPoints(10);
             }
+            // remove object from raphael paper
             pacman.pellets[playerPosition.row][playerPosition.col].remove();
+            // remove from the container grid
             pacman.pellets[playerPosition.row][playerPosition.col] = undefined;
         }
     }
@@ -113,8 +119,7 @@ var pacman = (function() {
 
     return {
         start: start,
-        addPoints: addPoints,
-        fright: fright
+        addPoints: addPoints
     };
 })();
 
