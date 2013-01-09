@@ -6,15 +6,33 @@ pacman.Enemy = function(name, startPosition) {
     this.ai = pacman.ai["blinky"];
     this.movement = {x: -1, y: 0};
     this.mode = "out";
+    this.colour = pacman.config.colours.ghost[this.name];
+    this.otherColour = pacman.config.colours.deadGhost;
 
-    // paper object
-    this.paperObject = pacman.paper.path();
-    this.paperObject.attr(pacman.svg.ghost(this.position));
-    this.paperObject.attr("fill", pacman.config.colours.ghost[this.name]);
-    this.paperObject.attr("stroke", "none");
+    // paper objects
+    // body
+    this.body = pacman.paper.path();
+    this.body.attr(pacman.svg.ghostBody(this.position, this.colour));
+    // left eye
+    this.leftEye = pacman.paper.circle(0, 0, 0);
+    this.leftEye.attr(pacman.svg.eye("left", this.position));
+    this.leftPupil = pacman.paper.circle(0, 0, 0);
+    this.leftPupil.attr(pacman.svg.pupil("left", this.position, this.movement));
+    // right eye
+    this.rightEye = pacman.paper.circle(0, 0, 0);
+    this.rightEye.attr(pacman.svg.eye("right", this.position));
+    this.rightPupil = pacman.paper.circle(0, 0, 0);
+    this.rightPupil.attr(pacman.svg.pupil("right", this.position, this.movement));
 
     this.animate = function() {
-        this.paperObject.attr(pacman.svg.ghost(this.position));
+        // animate body
+        this.body.attr(pacman.svg.ghostBody(this.position, this.colour));
+        // animate left eye and pupil
+        this.leftEye.attr(pacman.svg.eye("left", this.position));
+        this.leftPupil.attr(pacman.svg.pupil("left", this.position, this.movement));
+        // animate right eye and pupil
+        this.rightEye.attr(pacman.svg.eye("right", this.position));
+        this.rightPupil.attr(pacman.svg.pupil("right", this.position, this.movement));
     };
 
     this.move = function() {
@@ -52,15 +70,18 @@ pacman.Enemy = function(name, startPosition) {
 
             // if ghost is dead and reaches safe target, start going inside home
             if (this.mode === "dead" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
-                this.mode = "out";
+                this.mode = "in";
             }
             // if ghost is going in and reaches home position, start going out
             else if (this.mode === "in" && pacman.ghostHome.row === ownPosition.row && pacman.ghostHome.col === ownPosition.col) {
+                // ghost is home after death so show body again
+                this.body.show();
+                this.changeColour();
                 this.mode = "out";
             }
-            // if ghost is going out and reaches safe target, return to current game mode
+            // if ghost is going out and reaches safe target, return to chase mode
             else if (this.mode === "out" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
-                this.mode = pacman.mode;
+                this.mode = "chase";
             }
 
             var newMovement = this.ai.getMovement(this.movement, ownPosition, this.mode);
@@ -90,5 +111,16 @@ pacman.Enemy = function(name, startPosition) {
         }
         // up
         // down
+    };
+
+    this.die = function() {
+        this.mode = "dead";
+        this.body.hide();
+    };
+
+    this.changeColour = function() {
+        var temp = this.colour;
+        this.colour = this.otherColour;
+        this.otherColour = temp;
     };
 };

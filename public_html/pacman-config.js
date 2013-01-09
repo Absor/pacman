@@ -20,6 +20,7 @@ pacman.config = {
     },
     colours: {
         pacman: "rgb(255, 255, 0)",
+        deadGhost: "rgb(0, 0, 255)",
         ghost: {
             blinky: "rgb(255, 0, 0)",
             inky: "rgb(0, 245, 255)",

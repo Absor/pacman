@@ -1,6 +1,16 @@
 var pacman = (function() {
+    // starting points 0, add points to view
     var points = 0;
     $("#points").html(points);
+
+    // starting level
+    var level = 1;
+
+    // animation frame
+    var frame = 0;
+
+    // lifes
+    var lifes = 2;
 
     function addPoints(amount) {
         points += amount;
@@ -42,9 +52,15 @@ var pacman = (function() {
         });
     }
 
+    // start game
     function start() {
-        setInterval(tick, 1000 / 60);
+        pacman.gameInterval = setInterval(tick, 1000 / 60);
         chase();
+    }
+
+    // stop game
+    function stop() {
+        clearInterval(pacman.gameInterval);
     }
 
     function checkCollisions() {
@@ -54,8 +70,21 @@ var pacman = (function() {
             if (playerPosition.row === ghostPosition.row && playerPosition.col === ghostPosition.col) {
                 // handle collision
                 // ghost in fright mode: kill ghost
+                if (ghost.mode === "fright") {
+                    ghost.die();
+                    // TODO POINTS
+                }
                 // ghost in chase mode: -1 life and reset game
-                console.log("DÖD");
+                if (ghost.mode === "chase") {
+                    pacman.lifes--;
+                    if (pacman.lifes < 0) {
+                        stop();
+                        end();
+                    } else {
+                        stop();
+                        death();
+                    }
+                }
                 return;
             }
         });
@@ -70,10 +99,10 @@ var pacman = (function() {
             if (pacman.pellets[playerPosition.row][playerPosition.col].isPowerPellet) {
                 // if pellet is a power pellet, enter fright mode
                 fright();
-                pacman.addPoints(50);
+                addPoints(50);
             } else {
                 // normal pellet
-                pacman.addPoints(10);
+                addPoints(10);
             }
             // remove object from raphael paper
             pacman.pellets[playerPosition.row][playerPosition.col].remove();
@@ -101,31 +130,53 @@ var pacman = (function() {
         pacman.mode = "fright";
         setGhostMode(pacman.mode);
         clearInterval(pacman.modeInterval);
-        pacman.modeInterval = setInterval(chase, 15000);
+        pacman.modeInterval = setInterval(chase, 10000);
     }
 
     function setGhostMode(mode) {
         $.each(pacman.ghosts, function(index, ghost) {
             if (ghost.mode === "scatter" || ghost.mode === "chase" || ghost.mode === "fright") {
+                if ((ghost.mode !== "fright" && mode === "fright") || (ghost.mode === "fright" && mode !== "fright")) {
+                    ghost.changeColour();
+                }
                 ghost.mode = mode;
             }
         });
     }
 
-    // reset game: move everything to start position
-    function reset() {
+    function death() {
+        console.log("reset");
+        resetPositions();
+        setTimeout(start, 4000);
+    }
 
+    function resetPositions() {
+        pacman.player.position = pacman.playerStart;
+        pacman.player.movement = {x: -1, y: 0, objectRotation: 180};
+        pacman.player.newMovement = {x: -1, y: 0, objectRotation: 180};
+        $.each(pacman.ghosts, function(index, ghost) {
+            ghost.position = ghost.originalStart;
+            ghost.mode = "out";
+            ghost.movement = {x: -1, y: 0};
+        });
+    }
+
+    // ends game
+    function end() {
+        console.log("end");
     }
 
     return {
         start: start,
-        addPoints: addPoints
+        addPoints: addPoints,
+        level: level,
+        frame: frame,
+        lifes: lifes
     };
 })();
 
 $(document).ready(function() {
-    // animation frame
-    pacman.frame = 0;
+
     // create paper
     pacman.paper = Raphael(pacman.config.containerId, 0, 0);
 
