@@ -94,4 +94,24 @@ pacman.Player = function() {
         }
         return true;
     };
+    
+    this.eat = function() {
+        // where is pac-man
+        var playerPosition = pacman.tools.getTilePosition(this.position);
+        // check if there are pellets in pac-man's position and if yes, remove from game and add points
+        if (pacman.pellets[playerPosition.row][playerPosition.col] !== undefined) {
+            if (pacman.pellets[playerPosition.row][playerPosition.col].isPowerPellet) {
+                // if pellet is a power pellet, enter fright mode
+                pacman.fright();
+                pacman.stats.addPoints(50);
+            } else {
+                // normal pellet
+                pacman.stats.addPoints(10);
+            }
+            // remove object from raphael paper
+            pacman.pellets[playerPosition.row][playerPosition.col].remove();
+            // remove from the container grid
+            pacman.pellets[playerPosition.row][playerPosition.col] = undefined;
+        }
+    };
 };
