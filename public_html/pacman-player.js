@@ -3,6 +3,7 @@ pacman.Player = function() {
     this.position = pacman.playerStart;
     this.movement = {x: -1, y: 0, objectRotation: 180};
     this.newMovement = this.movement;
+    this.mode = "chase";
 
     // paper object
     this.paperObject = pacman.paper.path();
@@ -15,7 +16,7 @@ pacman.Player = function() {
     };
 
     this.move = function() {
-        var speedLeft = pacman.config.speeds.player;
+        var speedLeft = pacman.tools.playerSpeed(this.mode);
 
         // move as far as possible in the direction we are going (in current tile)
 
