@@ -94,7 +94,7 @@ pacman.tools = (function() {
             return level * 200 - 100;
         }
         if (level < 10) {
-            level * 500;
+            return level * 500;
         }
         return 5000;
     }
