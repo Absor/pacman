@@ -16,7 +16,7 @@ pacman.config = {
     tileSize: 20,
     colours: {
         pacman: "rgb(255, 255, 0)",
-        deadGhost: "rgb(0, 0, 255)",
+        frightGhost: "rgb(0, 0, 255)",
         ghost: {
             blinky: "rgb(255, 0, 0)",
             inky: "rgb(0, 245, 255)",
