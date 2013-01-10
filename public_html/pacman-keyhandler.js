@@ -49,7 +49,10 @@ pacman.keyhandler = (function() {
             movement.x = 1;
             movement.objectRotation = 0;
         }
-
+        
+        if (objectRotation === null) {
+            return null;
+        }
         return movement;
     }
 
