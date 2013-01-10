@@ -30,6 +30,14 @@ pacman.tools = (function() {
     function sortByDistance(a, b) {
         return a.distance - b.distance;
     }
+    
+    function reset(object) {
+        object.position = object.originalStart;
+        object.movement = {x: -1, y: 0, objectRotation: 180};
+        if (object.newMovement !== undefined) {
+            object.newMovement = {x: -1, y: 0, objectRotation: 180};
+        }
+    }
 
     return {
         getMovement: getMovement,
