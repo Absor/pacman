@@ -3,9 +3,10 @@ pacman.Enemy = function(name, startPosition) {
     this.name = name;
     this.originalStart = startPosition;
     this.position = startPosition;
-    this.ai = pacman.ai["blinky"];
+    this.ai = pacman.ai[this.name];
     this.movement = {x: -1, y: 0};
-    this.mode = "out";
+    this.mode = "chase";
+    this.forcedTarget = pacman.goodTarget;
     this.colour = pacman.config.colours.ghost[this.name];
     this.elroyLevel = 0;
 
@@ -37,7 +38,7 @@ pacman.Enemy = function(name, startPosition) {
 
     this.move = function() {
         var speedLeft = pacman.tools.enemySpeed(this.mode, this.elroyLevel);
-        
+
         // TODO half speed when in tunnel area
 
         // move as far as possible in the direction we are going (in current tile)
@@ -68,22 +69,25 @@ pacman.Enemy = function(name, startPosition) {
 
         // if we get to crossroads, ask ai for where to go
         if (this.position.x % pacman.config.tileSize === 0 && this.position.y % pacman.config.tileSize === 0) {
-            var ownPosition = pacman.tools.tilePosition(this.position);
+            var ownPosition = pacman.tools.getTilePosition(this.position);
 
             // if ghost is dead and reaches safe target, start going inside home
             if (this.mode === "dead" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
-                this.setMode("in");
+                this.forcedTarget = pacman.ghostHome;
             }
-            // if ghost is going in and reaches home position, start going out
-            else if (this.mode === "in" && pacman.ghostHome.row === ownPosition.row && pacman.ghostHome.col === ownPosition.col) {
-                this.setMode("out");
+            // if ghost is going dead and reaches home position, start going out
+            else if (this.mode === "dead" && pacman.ghostHome.row === ownPosition.row && pacman.ghostHome.col === ownPosition.col) {
+                this.forcedTarget = pacman.goodTarget;
+                // can't change from dead so change mode first
+                this.mode = "";
+                this.setMode(pacman.mode);
             }
-            // if ghost is going out and reaches safe target, return to chase mode
-            else if (this.mode === "out" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
-                this.setMode("chase");
+            // if ghost is going out and reaches safe target, clear forced target
+            else if (this.forcedTarget !== null && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
+                this.forcedTarget = null;
             }
 
-            var newMovement = this.ai.getMovement(this.movement, ownPosition, this.mode);
+            var newMovement = this.ai.getMovement(this.movement, ownPosition, this.mode, this.forcedTarget);
             // if new movement didnt return anything (going outside the grid), don't change movement/direction
             if (newMovement !== undefined) {
                 this.movement = newMovement;
@@ -113,26 +117,27 @@ pacman.Enemy = function(name, startPosition) {
     };
 
     this.setMode = function(mode) {
-        // don't change mode if ghost is dead
-        switch(mode) {
-            // can only turn to chase or frightened if not dead
+        if (mode === this.mode) {
+            return;
+        }
+        switch (mode) {
+            // can only turn to chase, scatter or frightened if not dead
             case "chase":
+            case "scatter":
             case "fright":
-                if (mode !== "dead" || mode !== "in") {
-                    this.mode = mode;
+                if (this.mode === "dead") {
+                    break;
                 }
-                break;
-            // can always turn dead or going out
+                // can always turn dead or going out
             case "dead":
-            case "in":
-            case "out":
                 this.mode = mode;
+                this.forcedTarget = pacman.goodTarget;
                 break;
         }
-        
+
         // set right colours and visibility depending on mode
         // if dead
-        if(this.mode === "dead" || this.mode === "in") {
+        if (this.mode === "dead") {
             this.body.hide();
             return;
         }

@@ -1,9 +1,10 @@
 pacman.Player = function() {
     // position and movement
     this.position = pacman.playerStart;
+    this.originalStart = pacman.playerStart;
     this.movement = {x: -1, y: 0, objectRotation: 180};
     this.newMovement = this.movement;
-    this.mode = "chase";
+    this.mode = "normal";
 
     // paper object
     this.paperObject = pacman.paper.path();
@@ -95,7 +96,7 @@ pacman.Player = function() {
         }
         return true;
     };
-    
+
     this.eat = function() {
         // where is pac-man
         var playerPosition = pacman.tools.getTilePosition(this.position);
@@ -103,7 +104,7 @@ pacman.Player = function() {
         if (pacman.pellets[playerPosition.row][playerPosition.col] !== undefined) {
             if (pacman.pellets[playerPosition.row][playerPosition.col].isPowerPellet) {
                 // if pellet is a power pellet, enter fright mode
-                pacman.fright();
+                pacman.startFright();
                 pacman.stats.addPoints(50);
             } else {
                 // normal pellet
@@ -115,7 +116,7 @@ pacman.Player = function() {
             pacman.pellets[playerPosition.row][playerPosition.col] = undefined;
         }
     };
-    
+
     this.checkCollisions = function() {
         var playerPosition = pacman.tools.getTilePosition(pacman.player.position);
         $.each(pacman.ghosts, function(index, ghost) {
@@ -124,20 +125,26 @@ pacman.Player = function() {
                 // handle collision
                 // ghost in fright mode: kill ghost
                 if (ghost.mode === "fright") {
-                    ghost.die();
+                    ghost.setMode("dead");
                     // TODO POINTS
                 }
                 // ghost in chase mode: -1 life and reset game
                 if (ghost.mode === "chase") {
                     if (pacman.stats.removeLife()) {
-                        stop();
-                        death();
+                        pacman.reset();
                     } else {
-                        stop();
-                        end();
+                        console.log("end");
                     }
                 }
             }
         });
+    };
+
+    this.setMode = function(mode) {
+        if (mode == "fright") {
+            this.mode = mode;
+        } else {
+            this.mode = "normal";
+        }
     };
 };

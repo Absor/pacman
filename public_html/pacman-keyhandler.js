@@ -50,7 +50,7 @@ pacman.keyhandler = (function() {
             movement.objectRotation = 0;
         }
         
-        if (objectRotation === null) {
+        if (movement.objectRotation === null) {
             return null;
         }
         return movement;

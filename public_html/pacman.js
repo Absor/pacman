@@ -1,9 +1,6 @@
 var pacman = (function() {
     // animation frame
     var frame = 0;
-    
-    // show point counter
-    pacman.stats.addPoints(0);
 
     function tick() {
         pacman.frame++;
@@ -22,7 +19,7 @@ var pacman = (function() {
         // animate all
         animateObjects();
     }
-    
+
     function moveObjects() {
         // move pac-man
         pacman.player.move();
@@ -45,7 +42,7 @@ var pacman = (function() {
     // start game
     function start() {
         pacman.gameInterval = setInterval(tick, 1000 / 60);
-        chase();
+        startChase();
     }
 
     // stop game
@@ -53,37 +50,32 @@ var pacman = (function() {
         clearInterval(pacman.gameInterval);
     }
 
-    // functions for controlling modes
-    function chase() {
-        pacman.mode = "chase";
-        setGhostMode(pacman.mode);
-        clearInterval(pacman.modeInterval);
-        pacman.modeInterval = setInterval(scatter, 15000);
-    }
-
-    function scatter() {
-        pacman.mode = "scatter";
-        setGhostMode(pacman.mode);
-        clearInterval(pacman.modeInterval);
-        pacman.modeInterval = setInterval(chase, 5000);
-    }
-
-    function fright() {
-        pacman.mode = "fright";
-        setGhostMode(pacman.mode);
-        clearInterval(pacman.modeInterval);
-        pacman.modeInterval = setInterval(chase, 10000);
+    function startMode(mode) {
+        pacman.mode = mode;
+        pacman.player.setMode(mode);
+        setGhostMode(mode);
     }
 
     function setGhostMode(mode) {
         $.each(pacman.ghosts, function(index, ghost) {
-            if (ghost.mode === "scatter" || ghost.mode === "chase" || ghost.mode === "fright") {
-                if ((ghost.mode !== "fright" && mode === "fright") || (ghost.mode === "fright" && mode !== "fright")) {
-                    ghost.changeColour();
-                }
-                ghost.mode = mode;
-            }
+            ghost.setMode(mode);
         });
+    }
+
+    function startChase() {
+        startMode("chase");
+        pacman.modeTimeout = setTimeout(startScatter, 15000);
+    }
+
+    function startFright() {
+        startMode("fright");
+        clearTimeout(pacman.modeTimeout);
+        pacman.modeTimeout = setTimeout(startChase, 10000);
+    }
+
+    function startScatter() {
+        startMode("scatter");
+        pacman.modeTimeout = setTimeout(startChase, 5000);
     }
 
     function death() {
@@ -93,7 +85,7 @@ var pacman = (function() {
     }
 
     function reset() {
-        pacman.tools.reset(player);
+        pacman.tools.reset(pacman.player);
         $.each(pacman.ghosts, function(index, ghost) {
             pacman.tools.reset(ghost);
         });
@@ -106,7 +98,9 @@ var pacman = (function() {
 
     return {
         start: start,
-        frame: frame
+        reset: reset,
+        frame: frame,
+        startFright: startFright
     };
 })();
 
@@ -114,12 +108,12 @@ pacman.stats = (function() {
     var points = 0;
     var level = 1;
     var lifes = 2;
-    
+
     function addPoints(amount) {
         points += amount;
         $("#points").html(points);
     }
-    
+
     // removes one life, if no more lifes are left, returns false, otherwise true
     function removeLife() {
         lifes--;
@@ -128,17 +122,17 @@ pacman.stats = (function() {
         }
         return true;
     }
-    
+
     // adds one to level counter
     function nextLevel() {
         level++;
     }
-    
+
     // return current level
     function getLevel() {
         return level;
     }
-    
+
     return {
         addPoints: addPoints,
         removeLife: removeLife,

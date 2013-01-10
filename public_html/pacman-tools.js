@@ -43,7 +43,9 @@ pacman.tools = (function() {
         }
         // special for ghost
         if (object.mode !== undefined) {
-            object.mode = "out";
+            object.mode = "";
+            object.setMode("chase");
+            object.forcedTarget = pacman.goodTarget;
         }
     }
     
@@ -56,8 +58,8 @@ pacman.tools = (function() {
         var base = baseSpeed();
         var level = pacman.stats.level();
         switch(mode) {
-            case "chase":
-                if (level <== 20) {
+            case "normal":
+                if (level <= 20) {
                     return (80 + level) / 100 * base;
                 }
                 return 0.9 * base;
@@ -75,22 +77,23 @@ pacman.tools = (function() {
         var base = baseSpeed();
         var level = pacman.stats.level();
         switch(mode) {
+            case "dead":
+                return 1.5 * base;
+            case "scatter":
             case "chase":
                 if (level < 20) {
-                    return (75 + level + elroyLevel * 0.05)) / 100 * base;
+                    return (75 + level + elroyLevel * 0.05) / 100 * base;
                 }
                 return (0.95 + elroyLevel * 0.05) * base;
-                break;
             case "fright":
                 return 0.6 * base;
-                break;
         }
     }
     
     // calculates bonus symbol point by level
     function symbolPoints() {
         var level = pacman.stats.level();
-        if (level <== 5) {
+        if (level <= 5) {
             return level * 200 - 100;
         }
         if (level < 10) {
@@ -105,6 +108,7 @@ pacman.tools = (function() {
         getTilePosition: getTilePosition,
         sortByDistance: sortByDistance,
         playerSpeed: playerSpeed,
-        enemySpeed: enemySpeed
+        enemySpeed: enemySpeed,
+        reset: reset
     };
 })();

@@ -19,17 +19,14 @@ pacman.fieldBuilder = (function() {
         // container for enemy start locations
         pacman.enemyStarts = [];
         // bad areas for ghosts
-        pacman.badArea = [];
         // go through the field string
         for (var row = 0; row < fieldContainer.height; row++) {
             pacman.playerMovement[row] = [];
             pacman.enemyMovement[row] = [];
             pacman.pellets[row] = [];
-            pacman.badArea[row] = [];
             for (var col = 0; col < fieldContainer.width; col++) {
                 pacman.playerMovement[row][col] = true;
                 pacman.enemyMovement[row][col] = true;
-                pacman.badArea[row][col] = false;
                 switch (fieldContainer.field[row].charAt(col)) {
                     case "W":
                         // if it's a wall
@@ -42,7 +39,6 @@ pacman.fieldBuilder = (function() {
                         createGate(row, col);
                         pacman.playerMovement[row][col] = false;
                         // is also bad
-                        markBad(row, col);
                         break;
                     case "C":
                         // if it's a candy
@@ -60,11 +56,9 @@ pacman.fieldBuilder = (function() {
                         // if it's the enemy starting spot
                         setEnemyStart(row, col);
                         // is also bad
-                        markBad(row, col);
                         break;
                     case "B":
                         // bad area, ghosts can't stay here
-                        markBad(row, col);
                         break;
                     case "Z":
                         pacman.goodTarget = {row: row, col: col};
@@ -143,10 +137,6 @@ pacman.fieldBuilder = (function() {
             x: col * pacman.config.tileSize + pacman.config.tileSize / 2,
             y: row * pacman.config.tileSize
         });
-    }
-
-    function markBad(row, col) {
-        pacman.badArea[row][col] = true;
     }
 
     return {
