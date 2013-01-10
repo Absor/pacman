@@ -46,11 +46,53 @@ pacman.tools = (function() {
             object.mode = "out";
         }
     }
+    
+    // speed functions
+    function baseSpeed() {
+        return pacman.config.tileSize / 10;
+    }
+    
+    function playerSpeed(mode) {
+        var base = baseSpeed();
+        var level = pacman.stats.level();
+        switch(mode) {
+            case "chase":
+                if (level <== 20) {
+                    return (80 + level) / 100 * base;
+                }
+                return 0.9 * base;
+                break;
+            case "fright":
+                if (level < 15) {
+                    return (85 + level) / 100 * base;
+                }
+                return base;
+                break;
+        }
+    }
+    
+    function enemySpeed(mode, elroyLevel) {
+        var base = baseSpeed();
+        var level = pacman.stats.level();
+        switch(mode) {
+            case "chase":
+                if (level < 20) {
+                    return (75 + level + elroyLevel * 0.05)) / 100 * base;
+                }
+                return (0.95 + elroyLevel * 0.05) * base;
+                break;
+            case "fright":
+                return 0.6 * base;
+                break;
+        }
+    }
 
     return {
         getMovement: getMovement,
         distanceBetween: distanceBetween,
         getTilePosition: getTilePosition,
-        sortByDistance: sortByDistance
+        sortByDistance: sortByDistance,
+        playerSpeed: playerSpeed,
+        enemySpeed: enemySpeed
     };
 })();
