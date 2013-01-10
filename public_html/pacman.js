@@ -22,10 +22,10 @@ var pacman = (function() {
         });
 
         // collisions
-        checkCollisions();
+        pacman.player.checkCollisions();
 
         // eat everything at pac-man's position
-        eat();
+        pacman.player.eat();
 
         animateObjects();
     }
@@ -49,33 +49,6 @@ var pacman = (function() {
     // stop game
     function stop() {
         clearInterval(pacman.gameInterval);
-    }
-
-    function checkCollisions() {
-        var playerPosition = pacman.tools.getTilePosition(pacman.player.position);
-        $.each(pacman.ghosts, function(index, ghost) {
-            var ghostPosition = pacman.tools.getTilePosition(ghost.position);
-            if (playerPosition.row === ghostPosition.row && playerPosition.col === ghostPosition.col) {
-                // handle collision
-                // ghost in fright mode: kill ghost
-                if (ghost.mode === "fright") {
-                    ghost.die();
-                    // TODO POINTS
-                }
-                // ghost in chase mode: -1 life and reset game
-                if (ghost.mode === "chase") {
-                    pacman.lifes--;
-                    if (pacman.lifes < 0) {
-                        stop();
-                        end();
-                    } else {
-                        stop();
-                        death();
-                    }
-                }
-                return;
-            }
-        });
     }
 
     // functions for controlling modes
