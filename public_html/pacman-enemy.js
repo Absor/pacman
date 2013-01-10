@@ -8,6 +8,7 @@ pacman.Enemy = function(name, startPosition) {
     this.mode = "out";
     this.colour = pacman.config.colours.ghost[this.name];
     this.otherColour = pacman.config.colours.deadGhost;
+    this.elroyLevel = 0;
 
     // paper objects
     // body
@@ -36,7 +37,9 @@ pacman.Enemy = function(name, startPosition) {
     };
 
     this.move = function() {
-        var speedLeft = pacman.config.speeds.enemy;
+        var speedLeft = pacman.tools.enemySpeed(this.mode, this.elroyLevel);
+        
+        // TODO half speed when in tunnel area
 
         // move as far as possible in the direction we are going (in current tile)
         // going left
