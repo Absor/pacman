@@ -8,26 +8,28 @@ var pacman = (function() {
     function tick() {
         pacman.frame++;
         pacman.frame %= 30;
-
+        // check if there is any input and if yes, add new input to pac-man
         var movement = pacman.keyhandler.getMovement();
-        if (movement.objectRotation !== null) {
+        if (movement !== null) {
             pacman.player.newMovement = movement;
         }
-
+        // move all
+        moveObjects();
+        // collisions
+        pacman.player.checkCollisions();
+        // eat everything at pac-man's position
+        pacman.player.eat();
+        // animate all
+        animateObjects();
+    }
+    
+    function moveObjects() {
         // move pac-man
         pacman.player.move();
         // move ghosts
         $.each(pacman.ghosts, function(index, ghost) {
             ghost.move();
         });
-
-        // collisions
-        pacman.player.checkCollisions();
-
-        // eat everything at pac-man's position
-        pacman.player.eat();
-
-        animateObjects();
     }
 
     // helper functions
@@ -141,7 +143,7 @@ pacman.stats = (function() {
         addPoints: addPoints,
         removeLife: removeLife,
         nextLevel: nextLevel,
-        getLevel: getLevel
+        level: getLevel
     };
 })();
 
