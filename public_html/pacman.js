@@ -146,18 +146,14 @@ var pacman = (function() {
 
     function death() {
         console.log("reset");
-        resetPositions();
+        reset();
         setTimeout(start, 4000);
     }
 
-    function resetPositions() {
-        pacman.player.position = pacman.playerStart;
-        pacman.player.movement = {x: -1, y: 0, objectRotation: 180};
-        pacman.player.newMovement = {x: -1, y: 0, objectRotation: 180};
+    function reset() {
+        pacman.tools.reset(player);
         $.each(pacman.ghosts, function(index, ghost) {
-            ghost.position = ghost.originalStart;
-            ghost.mode = "out";
-            ghost.movement = {x: -1, y: 0};
+            pacman.tools.reset(ghost);
         });
     }
 
