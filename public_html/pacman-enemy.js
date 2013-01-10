@@ -7,7 +7,6 @@ pacman.Enemy = function(name, startPosition) {
     this.movement = {x: -1, y: 0};
     this.mode = "out";
     this.colour = pacman.config.colours.ghost[this.name];
-    this.otherColour = pacman.config.colours.deadGhost;
     this.elroyLevel = 0;
 
     // paper objects
@@ -69,22 +68,19 @@ pacman.Enemy = function(name, startPosition) {
 
         // if we get to crossroads, ask ai for where to go
         if (this.position.x % pacman.config.tileSize === 0 && this.position.y % pacman.config.tileSize === 0) {
-            var ownPosition = {row: this.position.y / pacman.config.tileSize, col: this.position.x / pacman.config.tileSize};
+            var ownPosition = pacman.tools.tilePosition(this.position);
 
             // if ghost is dead and reaches safe target, start going inside home
             if (this.mode === "dead" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
-                this.mode = "in";
+                this.setMode("in");
             }
             // if ghost is going in and reaches home position, start going out
             else if (this.mode === "in" && pacman.ghostHome.row === ownPosition.row && pacman.ghostHome.col === ownPosition.col) {
-                // ghost is home after death so show body again
-                this.body.show();
-                this.changeColour();
-                this.mode = "out";
+                this.setMode("out");
             }
             // if ghost is going out and reaches safe target, return to chase mode
             else if (this.mode === "out" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
-                this.mode = "chase";
+                this.setMode("chase");
             }
 
             var newMovement = this.ai.getMovement(this.movement, ownPosition, this.mode);
@@ -116,14 +112,37 @@ pacman.Enemy = function(name, startPosition) {
         // down
     };
 
-    this.die = function() {
-        this.mode = "dead";
-        this.body.hide();
-    };
-
-    this.changeColour = function() {
-        var temp = this.colour;
-        this.colour = this.otherColour;
-        this.otherColour = temp;
+    this.setMode = function(mode) {
+        // don't change mode if ghost is dead
+        switch(mode) {
+            // can only turn to chase or frightened if not dead
+            case "chase":
+            case "fright":
+                if (mode !== "dead" || mode !== "in") {
+                    this.mode = mode;
+                }
+                break;
+            // can always turn dead or going out
+            case "dead":
+            case "in":
+            case "out":
+                this.mode = mode;
+                break;
+        }
+        
+        // set right colours and visibility depending on mode
+        // if dead
+        if(this.mode === "dead" || this.mode === "in") {
+            this.body.hide();
+            return;
+        }
+        // if frightened
+        if (this.mode === "fright") {
+            this.colour = pacman.config.colours.frightGhost;
+            return;
+        }
+        // otherwise
+        this.colour = pacman.config.colours.ghost[this.name];
+        this.body.show();
     };
 };
