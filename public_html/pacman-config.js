@@ -14,10 +14,6 @@
 pacman.config = {
     containerId: "pacman",
     tileSize: 20,
-    speeds: {
-        player: 1.5,
-        enemy: 1.5
-    },
     colours: {
         pacman: "rgb(255, 255, 0)",
         deadGhost: "rgb(0, 0, 255)",
