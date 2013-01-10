@@ -86,6 +86,18 @@ pacman.tools = (function() {
                 break;
         }
     }
+    
+    // calculates bonus symbol point by level
+    function symbolPoints() {
+        var level = pacman.stats.level();
+        if (level <== 5) {
+            return level * 200 - 100;
+        }
+        if (level < 10) {
+            level * 500;
+        }
+        return 5000;
+    }
 
     return {
         getMovement: getMovement,
