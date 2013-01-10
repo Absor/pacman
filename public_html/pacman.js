@@ -1,21 +1,9 @@
 var pacman = (function() {
-    // starting points 0, add points to view
-    var points = 0;
-    $("#points").html(points);
-
-    // starting level
-    var level = 1;
-
     // animation frame
     var frame = 0;
-
-    // lifes
-    var lifes = 2;
-
-    function addPoints(amount) {
-        points += amount;
-        $("#points").html(points);
-    }
+    
+    // show point counter
+    pacman.stats.addPoints(0);
 
     function tick() {
         pacman.frame++;
@@ -90,27 +78,6 @@ var pacman = (function() {
         });
     }
 
-    //
-    function eat() {
-        // where is pac-man
-        var playerPosition = pacman.tools.getTilePosition(pacman.player.position);
-        // check if there are pellets in pac-man's position and if yes, remove from game and add points
-        if (pacman.pellets[playerPosition.row][playerPosition.col] !== undefined) {
-            if (pacman.pellets[playerPosition.row][playerPosition.col].isPowerPellet) {
-                // if pellet is a power pellet, enter fright mode
-                fright();
-                addPoints(50);
-            } else {
-                // normal pellet
-                addPoints(10);
-            }
-            // remove object from raphael paper
-            pacman.pellets[playerPosition.row][playerPosition.col].remove();
-            // remove from the container grid
-            pacman.pellets[playerPosition.row][playerPosition.col] = undefined;
-        }
-    }
-
     // functions for controlling modes
     function chase() {
         pacman.mode = "chase";
@@ -164,10 +131,44 @@ var pacman = (function() {
 
     return {
         start: start,
+        frame: frame
+    };
+})();
+
+pacman.stats = (function() {
+    var points = 0;
+    var level = 1;
+    var lifes = 2;
+    
+    function addPoints(amount) {
+        points += amount;
+        $("#points").html(points);
+    }
+    
+    // removes one life, if no more lifes are left, returns false, otherwise true
+    function removeLife() {
+        lifes--;
+        if (lifes < 0) {
+            return false;
+        }
+        return true;
+    }
+    
+    // adds one to level counter
+    function nextLevel() {
+        level++;
+    }
+    
+    // return current level
+    function getLevel() {
+        return level;
+    }
+    
+    return {
         addPoints: addPoints,
-        level: level,
-        frame: frame,
-        lifes: lifes
+        removeLife: removeLife,
+        nextLevel: nextLevel,
+        getLevel: getLevel
     };
 })();
 
