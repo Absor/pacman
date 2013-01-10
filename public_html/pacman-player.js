@@ -114,4 +114,29 @@ pacman.Player = function() {
             pacman.pellets[playerPosition.row][playerPosition.col] = undefined;
         }
     };
+    
+    this.checkCollisions = function() {
+        var playerPosition = pacman.tools.getTilePosition(pacman.player.position);
+        $.each(pacman.ghosts, function(index, ghost) {
+            var ghostPosition = pacman.tools.getTilePosition(ghost.position);
+            if (playerPosition.row === ghostPosition.row && playerPosition.col === ghostPosition.col) {
+                // handle collision
+                // ghost in fright mode: kill ghost
+                if (ghost.mode === "fright") {
+                    ghost.die();
+                    // TODO POINTS
+                }
+                // ghost in chase mode: -1 life and reset game
+                if (ghost.mode === "chase") {
+                    if (pacman.stats.removeLife()) {
+                        stop();
+                        death();
+                    } else {
+                        stop();
+                        end();
+                    }
+                }
+            }
+        });
+    };
 };
