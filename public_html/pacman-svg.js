@@ -1,5 +1,9 @@
 pacman.svg = (function() {
-    function player(position, rotation) {
+    // functions return attributes for Raphael paper elements
+    
+    // svg paths
+
+    function pacmanBody(position, rotation) {
         var r = pacman.config.tileSize / 2;
         var x = position.x + r;
         var y = position.y + r;
@@ -21,7 +25,7 @@ pacman.svg = (function() {
         };
     }
 
-    function enemy(position, color) {
+    function ghostBody(position, color) {
         var r = pacman.config.tileSize / 2;
         var x = position.x + r;
         var y = position.y + r;
@@ -34,8 +38,10 @@ pacman.svg = (function() {
             fill: color
         };
     }
+    
+    // svg circles
 
-    function eye(whichEye, position) {
+    function ghostEye(whichEye, position) {
         var x = position.x + pacman.config.tileSize / 3;
         if (whichEye === "right") {
             x += pacman.config.tileSize / 3;
@@ -49,7 +55,7 @@ pacman.svg = (function() {
         };
     }
 
-    function pupil(whichEye, position, movement) {
+    function ghostPupil(whichEye, position, movement) {
         var x = position.x + pacman.config.tileSize / 3;
         if (whichEye === "right") {
             x += pacman.config.tileSize / 3;
@@ -64,9 +70,9 @@ pacman.svg = (function() {
     }
 
     return {
-        pacman: player,
-        ghostBody: enemy,
-        eye: eye,
-        pupil: pupil
+        pacmanBody: pacmanBody,
+        ghostBody: ghostBody,
+        ghostEye: ghostEye,
+        ghostPupil: ghostPupil
     };
 })();
