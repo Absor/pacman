@@ -1,14 +1,19 @@
 pacman.Enemy = function(name, startPosition) {
-    // position and movement
     this.name = name;
+    
+    // position and movement
     this.originalStart = startPosition;
     this.position = startPosition;
-    this.ai = pacman.ai[this.name];
     this.movement = {x: -1, y: 0};
+    // ghost mode
     this.mode = "chase";
     this.forcedTarget = pacman.goodTarget;
-    this.colour = pacman.config.colours.ghost[this.name];
     this.elroyLevel = 0;
+    
+    this.ai = pacman.ai[this.name];
+    
+    this.colour = pacman.config.colours.ghost[this.name];
+
 
     // paper objects
     // body
