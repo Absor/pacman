@@ -18,15 +18,19 @@ pacman.fieldBuilder = (function() {
         pacman.pellets = [];
         // container for enemy start locations
         pacman.enemyStarts = [];
-        // bad areas for ghosts
+        // slow movement area
+        pacman.slowMovement = [];
+
         // go through the field string
         for (var row = 0; row < fieldContainer.height; row++) {
             pacman.playerMovement[row] = [];
             pacman.enemyMovement[row] = [];
             pacman.pellets[row] = [];
+            pacman.slowMovement[row] = [];
             for (var col = 0; col < fieldContainer.width; col++) {
                 pacman.playerMovement[row][col] = true;
                 pacman.enemyMovement[row][col] = true;
+                pacman.slowMovement[row][col] = false;
                 switch (fieldContainer.field[row].charAt(col)) {
                     case "W":
                         // if it's a wall
@@ -65,6 +69,9 @@ pacman.fieldBuilder = (function() {
                         break;
                     case "X":
                         pacman.ghostHome = {row: row, col: col};
+                        break;
+                    case "S":
+                        pacman.slowMovement[row][col] = true;
                         break;
                 }
             }
