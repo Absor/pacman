@@ -9,8 +9,6 @@ pacman.Player = function() {
     // paper object
     this.paperObject = pacman.paper.path();
     this.paperObject.attr(pacman.svg.pacman(this.position, this.movement.objectRotation));
-    this.paperObject.attr("fill", pacman.config.colours.pacman);
-    this.paperObject.attr("stroke", "none");
 
     this.animate = function() {
         this.paperObject.attr(pacman.svg.pacman(this.position, this.movement.objectRotation));
