@@ -1,15 +1,23 @@
 pacman.ai = {
+    // parameters:
+    // oldMovement  - ghost's old movement so we can know where we can't go
+    //                = where we came from
+    // ownPosition  - ghost's position
+    // movementGrid - movementGrid to use to check where we can move
     setUpDirections: function(oldMovement, ownPosition, movementGrid) {
         var directions = [];
 
-        // add directions to array if the direction has no walls or other obstacles
-        // and it is not the direction where we are coming from
+        // add directions to array if the direction has no walls or other
+        // obstacles and it is not the direction where we are coming from
+
         // can go up?
-        if (oldMovement.y !== 1 && movementGrid[ownPosition.row - 1][ownPosition.col]) {
+        if (oldMovement.y !== 1 &&
+                movementGrid[ownPosition.row - 1][ownPosition.col]) {
             directions.push({distance: null, x: 0, y: -1});
         }
         // can go right?
-        if (oldMovement.x !== -1 && movementGrid[ownPosition.row][ownPosition.col + 1]) {
+        if (oldMovement.x !== -1 &&
+                movementGrid[ownPosition.row][ownPosition.col + 1]) {
             directions.push({distance: null, x: 1, y: 0});
         }
         // can go down?
@@ -23,13 +31,30 @@ pacman.ai = {
         return directions;
     },
     // calculates distances for all directions in given array to target position
+    // parameters:
+    // directions     - directions array we set up with setUpDirections
+    // ownPosition    - ghost's position so we can count distances to target
+    //                  with directions array
+    // targetPosition - ghost's target
     setDistances: function(directions, ownPosition, targetPosition) {
+        // go through all directions in the array
         $.each(directions, function(index, direction) {
-            direction.distance = pacman.tools.distanceBetween(ownPosition.col + direction.x,
-                    ownPosition.row + direction.y, targetPosition.col, targetPosition.row);
+            // use tool function to calculate euclidean distance between ghost
+            // and the target
+            direction.distance = pacman.tools.distanceBetween(
+                    ownPosition.col + direction.x,
+                    ownPosition.row + direction.y,
+                    targetPosition.col,
+                    targetPosition.row);
         });
     }
 };
+
+// all ais only need to offer function getMovement that takes parameters
+// oldMovement  - ghost's old movement (for knowing where not to go usually)
+// ownPosition  - ghost's position (for route search)
+// mode         - ghost's mode (for different behaviour for different modes
+// forcedTarget - forced target (overriding normal target)
 
 // Blinky
 pacman.ai.blinky = (function() {

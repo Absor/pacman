@@ -3,17 +3,18 @@
 // C = candy (pellet)
 // P = player / Pac-Man
 // U = power-up (power pellet)
-// S = score area
-// L = life / fruit counter area
+// S = slow, half speed area for ghosts
 // G = ghost room gate
 // H = ghost start
 // X = ghost home (reset spot)
 // N = no coin area (empty corridor)
-// B = bad area
 
 pacman.config = {
+    // the container (div) that holds the svg-elements of the game
     containerId: "pacman",
+    // size of one tile in the game grid (about pac-man's size)
     tileSize: 20,
+    // colour settings, names self-explanatory
     colours: {
         pacman: "rgb(255, 255, 0)",
         frightGhost: "rgb(0, 0, 255)",
@@ -30,6 +31,7 @@ pacman.config = {
         powerPellet: "rgb(255, 255, 255)"
     },
     playField1: {
+        // if you expand the play field strings, keep these updated too
         width: 28,
         height: 31,
         field: [
@@ -46,9 +48,9 @@ pacman.config = {
             "WWWWWWCWWWWWNWWNWWWWWCWWWWWW",
             "WWWWWWCWWNNNNHZNNNNWWCWWWWWW",
             "WWWWWWCWWNWWWGGWWWNWWCWWWWWW",
-            "WWWWWWCWWNWBBBBBBWNWWCWWWWWW",
-            "NNNNNNCNNNWHBHXHBWNNNCNNNNNN",
-            "WWWWWWCWWNWBBBBBBWNWWCWWWWWW",
+            "WWWWWWCWWNWNNNNNNWNWWCWWWWWW",
+            "SSSSSSCNNNWHNHXHNWNNNCSSSSSS",
+            "WWWWWWCWWNWNNNNNNWNWWCWWWWWW",
             "WWWWWWCWWNWWWWWWWWNWWCWWWWWW",
             "WWWWWWCWWNNNNNNNNNNWWCWWWWWW",
             "WWWWWWCWWNWWWWWWWWNWWCWWWWWW",
