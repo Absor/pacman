@@ -16,6 +16,8 @@ pacman.svg = (function() {
             y: y,
             path: [["M", x, y], ["l", r * Math.cos(startAngle), r * Math.sin(startAngle)], ["A", r, r, 0, +flag, 1, x + r * Math.cos(endAngle), y + r * Math.sin(endAngle)], ["z"]],
             transform: ["r", rotation, x, y]
+            fill: pacman.config.colours.pacman,
+            stroke: "none";
         };
     }
 
