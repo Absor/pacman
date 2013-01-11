@@ -20,6 +20,8 @@ var pacman = (function() {
         animateObjects();
     }
 
+    // object group functions
+    
     function moveObjects() {
         // move pac-man
         pacman.player.move();
@@ -29,7 +31,6 @@ var pacman = (function() {
         });
     }
 
-    // helper functions
     function animateObjects() {
         // Pac-Man
         pacman.player.animate();
@@ -38,28 +39,28 @@ var pacman = (function() {
             ghost.animate();
         });
     }
-
-    // start game
-    function start() {
-        pacman.gameInterval = setInterval(tick, 1000 / 60);
-        startChase();
-    }
-
-    // stop game
-    function stop() {
-        clearInterval(pacman.gameInterval);
-    }
-
-    function startMode(mode) {
-        pacman.mode = mode;
+    
+    function setObjectsMode(mode) {
+        // pac-man
         pacman.player.setMode(mode);
-        setGhostMode(mode);
-    }
-
-    function setGhostMode(mode) {
+        // ghosts
         $.each(pacman.ghosts, function(index, ghost) {
             ghost.setMode(mode);
         });
+    }
+    
+    function resetObjects() {
+        pacman.tools.reset(pacman.player);
+        $.each(pacman.ghosts, function(index, ghost) {
+            pacman.tools.reset(ghost);
+        });
+    }
+
+    // mode start and interval functions
+    
+    function startMode(mode) {
+        pacman.mode = mode;
+        setObjectsMode(mode);
     }
 
     function startChase() {
@@ -77,18 +78,18 @@ var pacman = (function() {
         startMode("scatter");
         pacman.modeTimeout = setTimeout(startChase, 5000);
     }
-
-    function death() {
-        console.log("reset");
-        reset();
-        setTimeout(start, 4000);
+    
+    // game control functions
+    
+    // start game
+    function start() {
+        pacman.gameInterval = setInterval(tick, 1000 / 60);
+        startChase();
     }
 
-    function reset() {
-        pacman.tools.reset(pacman.player);
-        $.each(pacman.ghosts, function(index, ghost) {
-            pacman.tools.reset(ghost);
-        });
+    // stop game
+    function stop() {
+        clearInterval(pacman.gameInterval);
     }
 
     // ends game
