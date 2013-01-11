@@ -58,17 +58,21 @@ pacman.tools = (function() {
         var base = baseSpeed();
         var level = pacman.stats.level();
         switch(mode) {
-            case "normal":
-                if (level <= 20) {
-                    return (80 + level) / 100 * base;
-                }
-                return 0.9 * base;
-                break;
             case "fright":
+                // in fright mode: levels 1-14 (85+level)% of base speed
                 if (level < 15) {
                     return (85 + level) / 100 * base;
                 }
+                // after level 14 100% of base speed
                 return base;
+                break;
+            default:
+                // in other modes: levels 1-20 (80+level)% of base speed
+                if (level <= 20) {
+                    return (80 + level) / 100 * base;
+                }
+                // drops to 90% base speed after level 20
+                return 0.9 * base;
                 break;
         }
     }
@@ -77,16 +81,20 @@ pacman.tools = (function() {
         var base = baseSpeed();
         var level = pacman.stats.level();
         switch(mode) {
+            // while dead 150% base speed
             case "dead":
                 return 1.5 * base;
-            case "scatter":
-            case "chase":
-                if (level < 20) {
-                    return (75 + level + elroyLevel * 0.05) / 100 * base;
-                }
-                return (0.95 + elroyLevel * 0.05) * base;
+            // in fright mode slow down to 60% base speed
             case "fright":
                 return 0.6 * base;
+            default:
+                // in other modes: levels 1-19 (75 + level + elroyLevel * 5)%  base speed
+                if (level < 20) {
+                    return (75 + level + elroyLevel * 5) / 100 * base;
+                }
+                // after level 19 (95 + elroyLevel * 5)% base speed
+                return (0.95 + elroyLevel * 5) * base;
+            
         }
     }
     
