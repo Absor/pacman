@@ -8,91 +8,126 @@ pacman.Player = function() {
 
     // paper object
     this.paperObject = pacman.paper.path();
-    this.paperObject.attr(pacman.svg.pacman(this.position, this.movement.objectRotation));
+    this.paperObject.attr(pacman.svg.pacmanBody(this.position, this.movement.objectRotation));
 
     this.animate = function() {
-        this.paperObject.attr(pacman.svg.pacman(this.position, this.movement.objectRotation));
+        this.paperObject.attr(pacman.svg.pacmanBody(this.position, this.movement.objectRotation));
     };
 
     this.move = function() {
-        var speedLeft = pacman.tools.playerSpeed(this.mode);
+        var speed = pacman.tools.playerSpeed(this.mode);
 
-        // move as far as possible in the direction we are going (in current tile)
+        if (this.isChangingDirection() && this.canChangeDirection() && this.canMove(this.newMovement, speed)) {
+            // if reversing direction, just move, otherwise align to center and move
+            if (this.movement.x === (-1) * this.newMovement.x && this.movement.y === (-1) * this.newMovement.y) {
+                this.doMovement(this.newMovement, speed);
+            } else {
+                this.align();
+                this.doMovement(this.newMovement, speed);
+            }
 
-        // going left
-        if (this.movement.x < 0 && this.position.x % pacman.config.tileSize < speedLeft) {
-            var distance = this.position.x % pacman.config.tileSize;
-            this.position.x -= distance;
-            speedLeft -= distance;
-        }
-        // going right
-        else if (this.movement.x > 0 && this.position.x % pacman.config.tileSize + speedLeft > pacman.config.tileSize) {
-            var distance = pacman.config.tileSize - this.position.x % pacman.config.tileSize;
-            this.position.x += distance;
-            speedLeft -= distance;
-        }
-        // going up
-        else if (this.movement.y < 0 && this.position.y % pacman.config.tileSize < speedLeft) {
-            var distance = this.position.y % pacman.config.tileSize;
-            this.position.y -= distance;
-            speedLeft -= distance;
-        }
-        // going down
-        else if (this.movement.y > 0 && this.position.y % pacman.config.tileSize + speedLeft > pacman.config.tileSize) {
-            var distance = pacman.config.tileSize - this.position.y % pacman.config.tileSize;
-            this.position.y += distance;
-            speedLeft -= distance;
-        }
-
-        // move the rest of the distance
-
-        // check if we can move with new input
-        var newMovementNewPosition = {
-            x: this.position.x + this.newMovement.x * speedLeft,
-            y: this.position.y + this.newMovement.y * speedLeft
-        };
-        if (this.canMove(newMovementNewPosition)) {
-            this.position = newMovementNewPosition;
-            // if we can move, change movement to new movement
+            // start using new movement
             this.movement = this.newMovement;
-            return;
+        } else {
+            // if no change in direction or we just can't move to new position
+            
+            // if pac-man can move just move
+            if (this.canMove(this.movement, speed)) {
+                this.doMovement(this.movement, speed);
+            } else {
+                // if pac-man can't move align to center
+                this.align();
+            }
+
+            // cancel the new movement because we used old
+            this.newMovement = this.movement;
         }
 
-        // if we cant move with new, try with old
-        var oldMovementNewPosition = {
-            x: this.position.x + this.movement.x * speedLeft,
-            y: this.position.y + this.movement.y * speedLeft
-        };
-        if (this.canMove(oldMovementNewPosition)) {
-            this.position = oldMovementNewPosition;
-            this.newMovement = this.movement;
-            return;
-        }
+        // check if pac-man is outside the grid and correct it
+        this.correctPosition();
     };
 
-    this.canMove = function(position) {
-        // test every corner of pac-man to see if he can fully fit into new position
-        // upper left
-        var ulRow = Math.floor(position.y / pacman.config.tileSize);
-        var ulCol = Math.floor(position.x / pacman.config.tileSize);
-        if (!pacman.playerMovement[ulRow][ulCol]) {
-            return false;
+    this.isChangingDirection = function() {
+        // if new movement is something else than old movement return true
+        if (this.movement.x !== this.newMovement.x || this.movement.y !== this.newMovement.y) {
+            return true;
         }
-        // upper right (row is the same as upper left)
-        var urCol = Math.floor((position.x + pacman.config.tileSize - 0.001) / pacman.config.tileSize);
-        if (!pacman.playerMovement[ulRow][urCol]) {
-            return false;
+        return false;
+    };
+
+    this.canChangeDirection = function() {
+        // can always reverse direction
+        if (this.movement.x === (-1) * this.newMovement.x && this.movement.y === (-1) * this.newMovement.y) {
+            return true;
         }
-        // bottom left (col is the same as upper left)
-        var blRow = Math.floor((position.y + pacman.config.tileSize - 0.001) / pacman.config.tileSize);
-        if (!pacman.playerMovement[blRow][ulCol]) {
-            return false;
+        // otherwise can change direction if close enough to middle of the current tile
+        var tilePosition = pacman.tools.getTilePosition(this.position);
+        var tileMiddlePosition = {
+            x: pacman.config.tileSize * tilePosition.col + pacman.config.tileSize / 2,
+            y: pacman.config.tileSize * tilePosition.row + pacman.config.tileSize / 2
+        };
+
+        var distanceFromMiddle = pacman.tools.distanceBetween(this.position.x,
+                this.position.y, tileMiddlePosition.x, tileMiddlePosition.y);
+        if (distanceFromMiddle < pacman.config.tileSize / 8) {
+            return true;
         }
-        // bottom right (upper right column and bottom left row)
-        if (!pacman.playerMovement[blRow][urCol]) {
-            return false;
+        return false;
+    };
+
+    this.align = function() {
+        // moves object to the middle of current tile
+        var tilePosition = pacman.tools.getTilePosition(this.position);
+        var tileMiddlePosition = {
+            x: pacman.config.tileSize * tilePosition.col + pacman.config.tileSize / 2,
+            y: pacman.config.tileSize * tilePosition.row + pacman.config.tileSize / 2
+        };
+        this.position = tileMiddlePosition;
+    };
+
+    this.canMove = function(movement, speed) {
+        // motion side edge position
+        var edgePosition = {
+            x: this.position.x + (pacman.config.tileSize / 2 + speed) * movement.x,
+            y: this.position.y + (pacman.config.tileSize / 2 + speed) * movement.y
+        };
+        // what tile is the edge in
+        var tilePosition = pacman.tools.getTilePosition(edgePosition);
+        // if the tile is good to move in (undefined for moving outside the grid)
+        if (pacman.playerMovement[tilePosition.row] === undefined ||
+                pacman.playerMovement[tilePosition.row][tilePosition.col] === undefined ||
+                pacman.playerMovement[tilePosition.row][tilePosition.col]) {
+            return true;
         }
-        return true;
+        return false;
+    };
+
+    this.doMovement = function(movement, speed) {
+        var newPosition = {
+            x: this.position.x + speed * movement.x,
+            y: this.position.y + speed * movement.y
+        };
+        this.position = newPosition;
+    };
+
+    // moves object to the other side if it moves outside grid
+    this.correctPosition = function() {
+        // going out from left
+        if (this.position.x < 0) {
+            this.position.x += pacman.config.tileSize * pacman.fieldInUse.width;
+        }
+        // going out from right
+        if (this.position.x > pacman.config.tileSize * pacman.fieldInUse.width) {
+            this.position.x -= pacman.config.tileSize * pacman.fieldInUse.width;
+        }
+        // going out from top
+        if (this.position.y < 0) {
+            this.position.y += pacman.config.tileSize * pacman.fieldInUse.height;
+        }
+        // going out from bottom
+        if (this.position.y > pacman.config.tileSize * pacman.fieldInUse.height) {
+            this.position.y -= pacman.config.tileSize * pacman.fieldInUse.height;
+        }
     };
 
     this.eat = function() {
@@ -125,11 +160,10 @@ pacman.Player = function() {
                 if (ghost.mode === "fright") {
                     ghost.setMode("dead");
                     // TODO POINTS
-                }
-                // ghost in chase mode: -1 life and reset game
-                if (ghost.mode === "chase") {
+                } else if (ghost.mode !== "dead") {
+                    // ghost not dead: -1 life and reset game
                     if (pacman.stats.removeLife()) {
-                        pacman.reset();
+                        pacman.resetObjects();
                     } else {
                         console.log("end");
                     }
@@ -139,10 +173,6 @@ pacman.Player = function() {
     };
 
     this.setMode = function(mode) {
-        if (mode == "fright") {
-            this.mode = mode;
-        } else {
-            this.mode = "normal";
-        }
+        this.mode = mode;
     };
 };

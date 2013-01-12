@@ -23,8 +23,8 @@ pacman.tools = (function() {
     // gives position in grid by pixel position
     function getTilePosition(position) {
         return {
-            row: Math.floor((position.y + pacman.config.tileSize / 2) / pacman.config.tileSize),
-            col: Math.floor((position.x + pacman.config.tileSize / 2) / pacman.config.tileSize)
+            row: Math.floor(position.y / pacman.config.tileSize),
+            col: Math.floor(position.x / pacman.config.tileSize)
         };
     }
 
@@ -32,7 +32,7 @@ pacman.tools = (function() {
     function sortByDistance(a, b) {
         return a.distance - b.distance;
     }
-    
+
     // resets positions and movements to start conditions
     function reset(object) {
         object.position = object.originalStart;
@@ -48,16 +48,16 @@ pacman.tools = (function() {
             object.forcedTarget = pacman.goodTarget;
         }
     }
-    
+
     // speed functions
     function baseSpeed() {
         return pacman.config.tileSize / 10;
     }
-    
+
     function playerSpeed(mode) {
         var base = baseSpeed();
         var level = pacman.stats.level();
-        switch(mode) {
+        switch (mode) {
             case "fright":
                 // in fright mode: levels 1-14 (85+level)% of base speed
                 if (level < 15) {
@@ -76,15 +76,15 @@ pacman.tools = (function() {
                 break;
         }
     }
-    
+
     function enemySpeed(mode, elroyLevel) {
         var base = baseSpeed();
         var level = pacman.stats.level();
-        switch(mode) {
+        switch (mode) {
             // while dead 150% base speed
             case "dead":
                 return 1.5 * base;
-            // in fright mode slow down to 60% base speed
+                // in fright mode slow down to 60% base speed
             case "fright":
                 return 0.6 * base;
             default:
@@ -94,10 +94,10 @@ pacman.tools = (function() {
                 }
                 // after level 19 (95 + elroyLevel * 5)% base speed
                 return (0.95 + elroyLevel * 5) * base;
-            
+
         }
     }
-    
+
     // calculates bonus symbol point by level
     function symbolPoints() {
         var level = pacman.stats.level();

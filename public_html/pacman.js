@@ -99,9 +99,9 @@ var pacman = (function() {
 
     return {
         start: start,
-        reset: reset,
         frame: frame,
-        startFright: startFright
+        startFright: startFright,
+        resetObjects: resetObjects
     };
 })();
 

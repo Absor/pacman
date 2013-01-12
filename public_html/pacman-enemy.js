@@ -1,6 +1,6 @@
 pacman.Enemy = function(name, startPosition) {
     this.name = name;
-    
+
     // position and movement
     this.originalStart = startPosition;
     this.position = startPosition;
@@ -9,9 +9,9 @@ pacman.Enemy = function(name, startPosition) {
     this.mode = "chase";
     this.forcedTarget = pacman.goodTarget;
     this.elroyLevel = 0;
-    
+
     this.ai = pacman.ai[this.name];
-    
+
     this.colour = pacman.config.colours.ghost[this.name];
 
 
@@ -21,104 +21,79 @@ pacman.Enemy = function(name, startPosition) {
     this.body.attr(pacman.svg.ghostBody(this.position, this.colour));
     // left eye
     this.leftEye = pacman.paper.circle(0, 0, 0);
-    this.leftEye.attr(pacman.svg.eye("left", this.position));
+    this.leftEye.attr(pacman.svg.ghostEye("left", this.position));
     this.leftPupil = pacman.paper.circle(0, 0, 0);
-    this.leftPupil.attr(pacman.svg.pupil("left", this.position, this.movement));
+    this.leftPupil.attr(pacman.svg.ghostPupil("left", this.position, this.movement));
     // right eye
     this.rightEye = pacman.paper.circle(0, 0, 0);
-    this.rightEye.attr(pacman.svg.eye("right", this.position));
+    this.rightEye.attr(pacman.svg.ghostEye("right", this.position));
     this.rightPupil = pacman.paper.circle(0, 0, 0);
-    this.rightPupil.attr(pacman.svg.pupil("right", this.position, this.movement));
+    this.rightPupil.attr(pacman.svg.ghostPupil("right", this.position, this.movement));
 
     this.animate = function() {
         // animate body
         this.body.attr(pacman.svg.ghostBody(this.position, this.colour));
         // animate left eye and pupil
-        this.leftEye.attr(pacman.svg.eye("left", this.position));
-        this.leftPupil.attr(pacman.svg.pupil("left", this.position, this.movement));
+        this.leftEye.attr(pacman.svg.ghostEye("left", this.position));
+        this.leftPupil.attr(pacman.svg.ghostPupil("left", this.position, this.movement));
         // animate right eye and pupil
-        this.rightEye.attr(pacman.svg.eye("right", this.position));
-        this.rightPupil.attr(pacman.svg.pupil("right", this.position, this.movement));
+        this.rightEye.attr(pacman.svg.ghostEye("right", this.position));
+        this.rightPupil.attr(pacman.svg.ghostPupil("right", this.position, this.movement));
     };
 
     this.move = function() {
-        var speedLeft = pacman.tools.enemySpeed(this.mode, this.elroyLevel);
+        var speed = pacman.tools.enemySpeed(this.mode, this.elroyLevel);
 
-        // TODO half speed when in tunnel area
-
-        // move as far as possible in the direction we are going (in current tile)
-        // going left
-        if (this.movement.x < 0 && this.position.x % pacman.config.tileSize < speedLeft) {
-            var distance = this.position.x % pacman.config.tileSize;
-            this.position.x -= distance;
-            speedLeft -= distance;
-        }
-        // going right
-        else if (this.movement.x > 0 && this.position.x % pacman.config.tileSize + speedLeft > pacman.config.tileSize) {
-            var distance = pacman.config.tileSize - this.position.x % pacman.config.tileSize;
-            this.position.x += distance;
-            speedLeft -= distance;
-        }
-        // going up
-        else if (this.movement.y < 0 && this.position.y % pacman.config.tileSize < speedLeft) {
-            var distance = this.position.y % pacman.config.tileSize;
-            this.position.y -= distance;
-            speedLeft -= distance;
-        }
-        // going down
-        else if (this.movement.y > 0 && this.position.y % pacman.config.tileSize + speedLeft > pacman.config.tileSize) {
-            var distance = pacman.config.tileSize - this.position.y % pacman.config.tileSize;
-            this.position.y += distance;
-            speedLeft -= distance;
+        if (this.goingOverMiddle(speed)) {
+            this.align();
+            this.movement = this.ai.getMovement(this.movement, this.position, this.mode, this.forcedTarget);
         }
 
-        // if we get to crossroads, ask ai for where to go
-        if (this.position.x % pacman.config.tileSize === 0 && this.position.y % pacman.config.tileSize === 0) {
-            var ownPosition = pacman.tools.getTilePosition(this.position);
+        this.doMovement(this.movement, speed);
+        
+        this.correctPosition();
+    };
 
-            // if ghost is dead and reaches safe target, start going inside home
-            if (this.mode === "dead" && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
-                this.forcedTarget = pacman.ghostHome;
-            }
-            // if ghost is going dead and reaches home position, start going out
-            else if (this.mode === "dead" && pacman.ghostHome.row === ownPosition.row && pacman.ghostHome.col === ownPosition.col) {
-                this.forcedTarget = pacman.goodTarget;
-                // can't change from dead so change mode first
-                this.mode = "";
-                this.setMode(pacman.mode);
-            }
-            // if ghost is going out and reaches safe target, clear forced target
-            else if (this.forcedTarget !== null && pacman.goodTarget.row === ownPosition.row && pacman.goodTarget.col === ownPosition.col) {
-                this.forcedTarget = null;
-            }
+    this.goingOverMiddle = function(speed) {
 
-            var newMovement = this.ai.getMovement(this.movement, ownPosition, this.mode, this.forcedTarget);
-            // if new movement didnt return anything (going outside the grid), don't change movement/direction
-            if (newMovement !== undefined) {
-                this.movement = newMovement;
-            }
-        }
+    };
 
-        // continue movement
-        var newPosition = {
-            x: this.position.x + this.movement.x * speedLeft,
-            y: this.position.y + this.movement.y * speedLeft
+    this.align = function() {
+        // moves object to the middle of current tile
+        var tilePosition = pacman.tools.getTilePosition(this.position);
+        var tileMiddlePosition = {
+            x: pacman.config.tileSize * tilePosition.col + pacman.config.tileSize / 2,
+            y: pacman.config.tileSize * tilePosition.row + pacman.config.tileSize / 2
         };
+        this.position = tileMiddlePosition;
+    };
 
+    this.doMovement = function(movement, speed) {
+        var newPosition = {
+            x: this.position.x + speed * movement.x,
+            y: this.position.y + speed * movement.y
+        };
         this.position = newPosition;
+    };
 
-        // if we move outside the field
-        // TODO
-        // left
+    // moves object to the other side if it moves outside grid
+    this.correctPosition = function() {
+        // going out from left
         if (this.position.x < 0) {
             this.position.x += pacman.config.tileSize * pacman.fieldInUse.width;
         }
-        // right
+        // going out from right
         if (this.position.x > pacman.config.tileSize * pacman.fieldInUse.width) {
             this.position.x -= pacman.config.tileSize * pacman.fieldInUse.width;
         }
-        // up
-        // down
+        // going out from top
+        if (this.position.y < 0) {
+            this.position.y += pacman.config.tileSize * pacman.fieldInUse.height;
+        }
+        // going out from bottom
+        if (this.position.y > pacman.config.tileSize * pacman.fieldInUse.height) {
+            this.position.y -= pacman.config.tileSize * pacman.fieldInUse.height;
+        }
     };
 
     this.setMode = function(mode) {
@@ -130,9 +105,10 @@ pacman.Enemy = function(name, startPosition) {
             case "chase":
             case "scatter":
             case "fright":
-                if (this.mode === "dead") {
-                    break;
+                if (this.mode !== "dead") {
+                    this.mode = mode;
                 }
+                break;
                 // can always turn dead or going out
             case "dead":
                 this.mode = mode;

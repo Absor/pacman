@@ -134,15 +134,15 @@ pacman.fieldBuilder = (function() {
 
     function setPlayerStart(row, col) {
         pacman.playerStart = {
-            x: col * pacman.config.tileSize + pacman.config.tileSize / 2,
-            y: row * pacman.config.tileSize
+            x: (col + 1) * pacman.config.tileSize,
+            y: row * pacman.config.tileSize + pacman.config.tileSize / 2
         };
     }
 
     function setEnemyStart(row, col) {
         pacman.enemyStarts.push({
-            x: col * pacman.config.tileSize + pacman.config.tileSize / 2,
-            y: row * pacman.config.tileSize
+            x: (col + 1) * pacman.config.tileSize,
+            y: row * pacman.config.tileSize + pacman.config.tileSize / 2
         });
     }
 
