@@ -4,6 +4,7 @@ pacman.stats = (function() {
     var lives = 2;
     var ghostPoints = 200;
 
+    var scoreList = [];
 
     function addPoints(amount) {
         var before = points % 10000;
@@ -64,11 +65,14 @@ pacman.stats = (function() {
     }
 
     function sendPoints() {
-        // http://aqueous-ravine-5531.herokuapp.com/app/games/1/scores/
+        scoreList.push(points);
     }
 
     function getTopScores() {
-
+        scoreList.sort(function(a, b) {
+            return b - a;
+        });
+        return scoreList;
     }
 
     return {

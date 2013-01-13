@@ -194,9 +194,6 @@ var pacman = (function() {
         // build starting screen (atm playfield, not startscreen)
         pacman.fieldBuilder.buildStartScreen();
         
-        // show top scores too
-        pacman.stats.getTopScores();
-        
         // what screen is in use
         screen = "start";
     }

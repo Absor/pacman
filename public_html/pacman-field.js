@@ -172,12 +172,24 @@ pacman.fieldBuilder = (function() {
 
     function buildStartScreen() {
         clearPaper();
-        var startText = pacman.paper.text(
-                pacman.config.playField.width / 2 * pacman.config.tileSize,
-                pacman.config.playField.height / 2 * pacman.config.tileSize,
-                "Start game by pressing ENTER"
-                );
-        startText.attr({fill: "rgb(255, 255, 255)"});
+        var x = pacman.config.playField.width / 2 * pacman.config.tileSize;
+        var y = pacman.config.playField.height / 3 * pacman.config.tileSize;
+        var maxY = pacman.config.playField.height * (2/3) * pacman.config.tileSize;
+        var startText = pacman.paper.text(x, y, "Start game by pressing ENTER");
+        startText.attr({fill: pacman.config.colours.textColour});
+        var scores = pacman.stats.getTopScores();
+
+        y += 2 * pacman.config.tileSize;
+        pacman.paper.text(x, y, "Top scores this session:").attr({fill: pacman.config.colours.textColour});
+
+        $.each(scores, function(index, score) {
+            y += pacman.config.tileSize;
+            if (y > maxY) {
+                return;
+            }
+            pacman.paper.text(x, y, "YOU " + score).attr({fill: pacman.config.colours.textColour});
+        });
+
     }
 
     function buildEndScreen() {
@@ -187,7 +199,7 @@ pacman.fieldBuilder = (function() {
                 pacman.config.playField.height / 2 * pacman.config.tileSize,
                 "GAME OVER\n\nContinue by pressing ENTER"
                 );
-        startText.attr({fill: "rgb(255, 255, 255)"});
+        startText.attr({fill: pacman.config.colours.textColour});
     }
 
     return {

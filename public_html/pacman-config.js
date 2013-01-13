@@ -29,7 +29,8 @@ pacman.config = {
         wall: "rgb(0, 100, 200)",
         gate: "rgb(255, 0, 0)",
         pellet: "rgb(255, 255, 0)",
-        powerPellet: "rgb(255, 255, 255)"
+        powerPellet: "rgb(255, 255, 255)",
+        textColour: "rgb(255, 255, 255)"
     },
     playField: {
         // if you expand the play field strings, keep these updated too
@@ -49,9 +50,9 @@ pacman.config = {
             "WWWWWWCWWWWWNWWNWWWWWCWWWWWW",
             "WWWWWWCWWNNNNHZNNNNWWCWWWWWW",
             "WWWWWWCWWNWWWGGWWWNWWCWWWWWW",
-            "WWWWWWCWWNWWWNNWWWNWWCWWWWWW",
+            "WWWWWWCWWNWNNNNNNWNWWCWWWWWW",
             "SSSSSSCNNNWHNHXHNWNNNCSSSSSS",
-            "WWWWWWCWWNWWWWWWWWNWWCWWWWWW",
+            "WWWWWWCWWNWNNNNNNWNWWCWWWWWW",
             "WWWWWWCWWNWWWWWWWWNWWCWWWWWW",
             "WWWWWWCWWNNNNNNNNNNWWCWWWWWW",
             "WWWWWWCWWNWWWWWWWWNWWCWWWWWW",
