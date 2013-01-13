@@ -33,22 +33,6 @@ pacman.tools = (function() {
         return a.distance - b.distance;
     }
 
-    // resets positions and movements to start conditions
-    function reset(object) {
-        object.position = object.originalStart;
-        object.movement = {x: -1, y: 0, objectRotation: 180};
-        // special for player
-        if (object.newMovement !== undefined) {
-            object.newMovement = {x: -1, y: 0, objectRotation: 180};
-        }
-        // special for ghost
-        if (object.mode !== undefined) {
-            object.mode = "";
-            object.setMode("chase");
-            object.forcedTarget = pacman.goodTarget;
-        }
-    }
-
     // speed functions
     function baseSpeed() {
         return pacman.config.tileSize / 10;
@@ -56,7 +40,7 @@ pacman.tools = (function() {
 
     function playerSpeed(mode) {
         var base = baseSpeed();
-        var level = pacman.stats.level();
+        var level = pacman.stats.level;
         switch (mode) {
             case "fright":
                 // in fright mode: levels 1-14 (85+level)% of base speed
@@ -79,7 +63,7 @@ pacman.tools = (function() {
 
     function enemySpeed(mode, elroyLevel) {
         var base = baseSpeed();
-        var level = pacman.stats.level();
+        var level = pacman.stats.level;
         switch (mode) {
             // while dead 150% base speed
             case "dead":
@@ -100,7 +84,7 @@ pacman.tools = (function() {
 
     // calculates bonus symbol point by level
     function symbolPoints() {
-        var level = pacman.stats.level();
+        var level = pacman.stats.level;
         if (level <= 5) {
             return level * 200 - 100;
         }
@@ -110,6 +94,37 @@ pacman.tools = (function() {
         return 5000;
     }
 
+    // returns elroy level 1 dots left limit
+    function elroyLevel() {
+        var level = pacman.stats.level;
+        // levels 1-2
+        if (level <= 2) {
+            return 30;
+        }
+        // levels 3-5
+        if (level <= 5) {
+            return 40;
+        }
+        // levels 6-8
+        if (level <= 8) {
+            return 50;
+        }
+        // levels 9-11
+        if (level <= 11) {
+            return 60;
+        }
+        // levels 12-14
+        if (level <= 14) {
+            return 80;
+        }
+        // levels 15-17
+        if (level <= 17) {
+            return 100;
+        }
+        // all the rest
+        return 120;
+    }
+
     return {
         getMovement: getMovement,
         distanceBetween: distanceBetween,
@@ -117,6 +132,6 @@ pacman.tools = (function() {
         sortByDistance: sortByDistance,
         playerSpeed: playerSpeed,
         enemySpeed: enemySpeed,
-        reset: reset
+        elroyLevel: elroyLevel
     };
 })();

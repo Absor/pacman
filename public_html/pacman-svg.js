@@ -44,7 +44,7 @@ pacman.svg = (function() {
         }
         return {
             cx: x,
-            cy: position.y - pacman.config.tileSize / 4,
+            cy: position.y - pacman.config.tileSize / 5,
             r: pacman.config.tileSize / 5,
             fill: "rgb(255, 255, 255)",
             stroke: "none"
@@ -58,7 +58,7 @@ pacman.svg = (function() {
         }
         return {
             cx: x + movement.x * 2,
-            cy: position.y - pacman.config.tileSize / 4 +
+            cy: position.y - pacman.config.tileSize / 5 +
                     movement.y * (pacman.config.tileSize / 10),
             r: pacman.config.tileSize / 10,
             fill: "rgb(0, 0, 0)",
@@ -66,10 +66,41 @@ pacman.svg = (function() {
         };
     }
 
+    // functions animate objects or create new objects with animations
+
+    function animateCountdownNumber(position, number) {
+        var number = pacman.paper.text(position.x, position.y, number);
+        number.attr({
+            font: pacman.config.tileSize + "px \"Arial\"",
+            fill: "rgb(255,0,0)"
+        });
+        number.animate({transform: "s3"}, 1000, ">", number.remove);
+    }
+
+    // changes colour between alarm and fright colour
+    function blinkGhosts() {
+        $.each(pacman.ghosts, function(index, ghost) {
+            if (ghost.mode === "fright") {
+                if (ghost.colour === pacman.config.colours.frightAlarm) {
+                    ghost.colour = pacman.config.colours.frightGhost;
+                } else {
+                    ghost.colour = pacman.config.colours.frightAlarm;
+                }
+            }
+        });
+    }
+
+    function animatePlayerDeath(callback) {
+        pacman.player.paperObject.animate({transform: "s0.01"}, 1000, "linear", callback);
+    }
+
     return {
         pacmanBody: pacmanBody,
         ghostBody: ghostBody,
         ghostEye: ghostEye,
-        ghostPupil: ghostPupil
+        ghostPupil: ghostPupil,
+        animateCountdownNumber: animateCountdownNumber,
+        blinkGhosts: blinkGhosts,
+        animatePlayerDeath: animatePlayerDeath
     };
 })();

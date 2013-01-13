@@ -22,6 +22,9 @@ pacman.keyhandler = (function() {
 
     function keydown(keycode) {
         keys[keycode] = true;
+        if (keycode === 13) {
+            pacman.enterEvent();
+        }
     }
 
     function keyup(keycode) {
@@ -49,7 +52,7 @@ pacman.keyhandler = (function() {
             movement.x = 1;
             movement.objectRotation = 0;
         }
-        
+
         if (movement.objectRotation === null) {
             return null;
         }

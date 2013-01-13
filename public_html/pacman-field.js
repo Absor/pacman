@@ -1,16 +1,22 @@
 pacman.fieldBuilder = (function() {
 
-    function buildField(fieldContainer) {
-        pacman.fieldInUse = fieldContainer;
+    function clearPaper() {
         // clear paper
         pacman.paper.clear();
         // set size
-        var paperWidth = fieldContainer.width * pacman.config.tileSize;
-        var paperHeight = fieldContainer.height * pacman.config.tileSize;
+        var paperWidth = pacman.config.playField.width * pacman.config.tileSize;
+        var paperHeight = pacman.config.playField.height * pacman.config.tileSize;
         pacman.paper.setSize(paperWidth, paperHeight);
         // create background
         var background = pacman.paper.rect(0, 0, paperWidth, paperHeight);
         background.attr("fill", pacman.config.colours.background);
+    }
+
+    function buildPlayField() {
+        pacman.fieldInUse = pacman.config.playField;
+
+        clearPaper();
+
         // movement fields for player and enemies
         pacman.playerMovement = [];
         pacman.enemyMovement = [];
@@ -20,18 +26,20 @@ pacman.fieldBuilder = (function() {
         pacman.enemyStarts = [];
         // slow movement area
         pacman.slowMovement = [];
+        // pellet counter
+        pacman.pelletCount = 0;
 
         // go through the field string
-        for (var row = 0; row < fieldContainer.height; row++) {
+        for (var row = 0; row < pacman.config.playField.height; row++) {
             pacman.playerMovement[row] = [];
             pacman.enemyMovement[row] = [];
             pacman.pellets[row] = [];
             pacman.slowMovement[row] = [];
-            for (var col = 0; col < fieldContainer.width; col++) {
+            for (var col = 0; col < pacman.config.playField.width; col++) {
                 pacman.playerMovement[row][col] = true;
                 pacman.enemyMovement[row][col] = true;
                 pacman.slowMovement[row][col] = false;
-                switch (fieldContainer.field[row].charAt(col)) {
+                switch (pacman.config.playField.field[row].charAt(col)) {
                     case "W":
                         // if it's a wall
                         createWall(row, col);
@@ -47,10 +55,12 @@ pacman.fieldBuilder = (function() {
                     case "C":
                         // if it's a candy
                         createPellet(row, col);
+                        pacman.pelletCount++;
                         break;
                     case "U":
                         // if it's a powerup
                         createPowerPellet(row, col);
+                        pacman.pelletCount++;
                         break;
                     case "P":
                         // if it's the player starting spot
@@ -107,6 +117,7 @@ pacman.fieldBuilder = (function() {
                 pacman.config.tileSize / 4);
         pellet.attr("fill", pacman.config.colours.pellet);
         pellet.attr("stroke", "none");
+        pellet.eaten = false;
         pacman.pellets[row][col] = pellet;
     }
 
@@ -129,6 +140,7 @@ pacman.fieldBuilder = (function() {
         }, 1000).repeat("Infinity");
         powerPellet.animate(anim);
         powerPellet.isPowerPellet = true;
+        powerPellet.eaten = false;
         pacman.pellets[row][col] = powerPellet;
     }
 
@@ -146,7 +158,42 @@ pacman.fieldBuilder = (function() {
         });
     }
 
+    function renewPellets() {
+        for (var row = 0; row < pacman.fieldInUse.height; row++) {
+            for (var col = 0; col < pacman.fieldInUse.width; col++) {
+                if (pacman.pellets[row][col] !== undefined) {
+                    pacman.pellets[row][col].show();
+                    pacman.pellets[row][col].eaten = false;
+                    pacman.pelletCount++;
+                }
+            }
+        }
+    }
+
+    function buildStartScreen() {
+        clearPaper();
+        var startText = pacman.paper.text(
+                pacman.config.playField.width / 2 * pacman.config.tileSize,
+                pacman.config.playField.height / 2 * pacman.config.tileSize,
+                "Start game by pressing ENTER"
+                );
+        startText.attr({fill: "rgb(255, 255, 255)"});
+    }
+
+    function buildEndScreen() {
+        clearPaper();
+        var startText = pacman.paper.text(
+                pacman.config.playField.width / 2 * pacman.config.tileSize,
+                pacman.config.playField.height / 2 * pacman.config.tileSize,
+                "GAME OVER\n\nContinue by pressing ENTER"
+                );
+        startText.attr({fill: "rgb(255, 255, 255)"});
+    }
+
     return {
-        buildField: buildField
+        buildPlayField: buildPlayField,
+        renewPellets: renewPellets,
+        buildStartScreen: buildStartScreen,
+        buildEndScreen: buildEndScreen
     };
 })();

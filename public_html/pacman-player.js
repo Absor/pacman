@@ -4,11 +4,10 @@ pacman.Player = function() {
     this.originalStart = pacman.playerStart;
     this.movement = {x: -1, y: 0, objectRotation: 180};
     this.newMovement = this.movement;
-    this.mode = "normal";
+    this.mode = "chase";
 
     // paper object
     this.paperObject = pacman.paper.path();
-    this.paperObject.attr(pacman.svg.pacmanBody(this.position, this.movement.objectRotation));
 
     this.animate = function() {
         this.paperObject.attr(pacman.svg.pacmanBody(this.position, this.movement.objectRotation));
@@ -30,7 +29,7 @@ pacman.Player = function() {
             this.movement = this.newMovement;
         } else {
             // if no change in direction or we just can't move to new position
-            
+
             // if pac-man can move just move
             if (this.canMove(this.movement, speed)) {
                 this.doMovement(this.movement, speed);
@@ -134,7 +133,11 @@ pacman.Player = function() {
         // where is pac-man
         var playerPosition = pacman.tools.getTilePosition(this.position);
         // check if there are pellets in pac-man's position and if yes, remove from game and add points
-        if (pacman.pellets[playerPosition.row][playerPosition.col] !== undefined) {
+        if (pacman.pellets[playerPosition.row][playerPosition.col] !== undefined &&
+                !pacman.pellets[playerPosition.row][playerPosition.col].eaten) {
+            // reduce pellet count
+            pacman.pelletCount--;
+            // points
             if (pacman.pellets[playerPosition.row][playerPosition.col].isPowerPellet) {
                 // if pellet is a power pellet, enter fright mode
                 pacman.startFright();
@@ -143,11 +146,12 @@ pacman.Player = function() {
                 // normal pellet
                 pacman.stats.addPoints(10);
             }
-            // remove object from raphael paper
-            pacman.pellets[playerPosition.row][playerPosition.col].remove();
-            // remove from the container grid
-            pacman.pellets[playerPosition.row][playerPosition.col] = undefined;
+            // hide object from raphael paper and set eaten to true
+            pacman.pellets[playerPosition.row][playerPosition.col].hide();
+            pacman.pellets[playerPosition.row][playerPosition.col].eaten = true;
+            return true;
         }
+        return false;
     };
 
     this.checkCollisions = function() {
@@ -159,13 +163,14 @@ pacman.Player = function() {
                 // ghost in fright mode: kill ghost
                 if (ghost.mode === "fright") {
                     ghost.setMode("dead");
-                    // TODO POINTS
+                    pacman.stats.addGhostPoints();
                 } else if (ghost.mode !== "dead") {
-                    // ghost not dead: -1 life and reset game
                     if (pacman.stats.removeLife()) {
-                        pacman.resetObjects();
+                        // return true if there are lifes left
+                        pacman.death(pacman.continueAfterDeath);
                     } else {
-                        console.log("end");
+                        // no lifes left so end game
+                        pacman.death(pacman.end);
                     }
                 }
             }
@@ -174,5 +179,13 @@ pacman.Player = function() {
 
     this.setMode = function(mode) {
         this.mode = mode;
+    };
+
+    // resets position and movements to start conditions
+    this.reset = function() {
+        this.position = pacman.playerStart;
+        this.movement = {x: -1, y: 0, objectRotation: 180};
+        this.newMovement = this.movement;
+        this.mode = "chase";
     };
 };

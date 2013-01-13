@@ -9,7 +9,7 @@ pacman.ai = {
 
         // add directions to array if the direction has no walls or other
         // obstacles and it is not the direction where we are coming from
-
+        
         // can go up?
         if (oldMovement.y !== 1 &&
                 movementGrid[ownPosition.row - 1][ownPosition.col]) {
@@ -70,7 +70,7 @@ pacman.ai.blinky = (function() {
             pacman.ai.setDistances(directions, ownPosition, forcedTarget);
         } else {
             movementGrid = pacman.playerMovement;
-            directions = pacman.ai.setUpDirections(oldMovement, ownPosition, movementGrid)
+            directions = pacman.ai.setUpDirections(oldMovement, ownPosition, movementGrid);
             // move by mode
             switch (mode) {
                 case "scatter":
@@ -115,7 +115,7 @@ pacman.ai.pinky = (function() {
             pacman.ai.setDistances(directions, ownPosition, forcedTarget);
         } else {
             movementGrid = pacman.playerMovement;
-            directions = pacman.ai.setUpDirections(oldMovement, ownPosition, movementGrid)
+            directions = pacman.ai.setUpDirections(oldMovement, ownPosition, movementGrid);
             // move by mode
             switch (mode) {
                 case "scatter":
@@ -165,7 +165,7 @@ pacman.ai.inky = (function() {
             pacman.ai.setDistances(directions, ownPosition, forcedTarget);
         } else {
             movementGrid = pacman.playerMovement;
-            directions = pacman.ai.setUpDirections(oldMovement, ownPosition, movementGrid)
+            directions = pacman.ai.setUpDirections(oldMovement, ownPosition, movementGrid);
             // move by mode
             switch (mode) {
                 case "scatter":

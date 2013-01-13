@@ -18,6 +18,7 @@ pacman.config = {
     colours: {
         pacman: "rgb(255, 255, 0)",
         frightGhost: "rgb(0, 0, 255)",
+        frightAlarm: "rgb(255, 255, 255)",
         ghost: {
             blinky: "rgb(255, 0, 0)",
             inky: "rgb(0, 245, 255)",
@@ -30,7 +31,7 @@ pacman.config = {
         pellet: "rgb(255, 255, 0)",
         powerPellet: "rgb(255, 255, 255)"
     },
-    playField1: {
+    playField: {
         // if you expand the play field strings, keep these updated too
         width: 28,
         height: 31,
@@ -48,9 +49,9 @@ pacman.config = {
             "WWWWWWCWWWWWNWWNWWWWWCWWWWWW",
             "WWWWWWCWWNNNNHZNNNNWWCWWWWWW",
             "WWWWWWCWWNWWWGGWWWNWWCWWWWWW",
-            "WWWWWWCWWNWNNNNNNWNWWCWWWWWW",
+            "WWWWWWCWWNWWWNNWWWNWWCWWWWWW",
             "SSSSSSCNNNWHNHXHNWNNNCSSSSSS",
-            "WWWWWWCWWNWNNNNNNWNWWCWWWWWW",
+            "WWWWWWCWWNWWWWWWWWNWWCWWWWWW",
             "WWWWWWCWWNWWWWWWWWNWWCWWWWWW",
             "WWWWWWCWWNNNNNNNNNNWWCWWWWWW",
             "WWWWWWCWWNWWWWWWWWNWWCWWWWWW",
